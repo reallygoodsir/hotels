@@ -4,4 +4,51 @@
 
 <web-app>
     <display-name>hotels web application</display-name>
+    <welcome-file-list>
+        <welcome-file>home</welcome-file>
+    </welcome-file-list>
+    <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.hotels.servlets.HomeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>HotelServlet</servlet-name>
+        <servlet-class>org.hotels.servlets.HotelServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HotelServlet</servlet-name>
+        <url-pattern>/hotel</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RoomServlet</servlet-name>
+        <servlet-class>org.hotels.servlets.RoomServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RoomServlet</servlet-name>
+        <url-pattern>/room</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ReserveConfirmationServlet</servlet-name>
+        <servlet-class>org.hotels.servlets.ReserveConfirmation</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReserveConfirmationServlet</servlet-name>
+        <url-pattern>/reserve-confirmation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ReserveServlet</servlet-name>
+        <servlet-class>org.hotels.servlets.ReserveServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReserveServlet</servlet-name>
+        <url-pattern>/reserve</url-pattern>
+    </servlet-mapping>
 </web-app>
