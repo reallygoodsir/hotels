@@ -3,17 +3,14 @@ package org.hotels.dao;
 import org.hotels.models.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class HotelDAOImpl implements HotelDAO {
-    // hotel name, city, country, price per night
-
     private static final String SEARCH_FOR_HOTELS =
             "select distinct hotel.hotel_id, hotel.name as hotel_name, " +
-                    "city.city_id as city_id, country.country_id as country_id " +
+                    "city.city_id as city_id, " +
+                    "city.name as city_name, " +
+                    "country.country_id as country_id " +
                     "from hotel hotel " +
                     "join hotel_address hotel_address " +
                     "on hotel.hotel_id = hotel_address.hotel_id " +
@@ -25,8 +22,9 @@ public class HotelDAOImpl implements HotelDAO {
                     "on hotel.hotel_id = room.hotel_id " +
                     "join room_info room_info " +
                     "on room.room_id = room_info.room_id " +
-                    "where country.name = ? and room_info.adults_capacity >= ? " +
-                    "and room_info.children_capacity = ? and room.is_available = 1";
+                    "where country.name = ? and room_info.adults_capacity = ? " +
+                    "and room_info.children_capacity = ? and room.is_available = 1 " +
+                    "order by city.name";
 
 
     //    private static final String SELECT_HOTEL = "select hotel.name from hotel where name = ?"
@@ -151,8 +149,7 @@ public class HotelDAOImpl implements HotelDAO {
     }
 
     @Override
-    public List<Hotel> searchForHotels(Date check_in, Date check_out, String countryName,
-                                       int childrenCapacity, int adultCapacity) {
+    public Map<String, List<Hotel>> searchForHotels(String countryName, int childrenCapacity, int adultCapacity) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
              PreparedStatement stmtSelectHotelsByCountry = connection.prepareStatement(SEARCH_FOR_HOTELS)) {
 
@@ -160,8 +157,8 @@ public class HotelDAOImpl implements HotelDAO {
             stmtSelectHotelsByCountry.setInt(2, adultCapacity);
             stmtSelectHotelsByCountry.setInt(3, childrenCapacity);
             ResultSet resultSet = stmtSelectHotelsByCountry.executeQuery();
+            Map<String, List<Hotel>> result = new HashMap<>();
 
-            List<Hotel> hotels = new ArrayList<>();
             while (resultSet.next()) {
                 Hotel hotel = new Hotel();
                 hotel.setName(resultSet.getString("hotel_name"));
@@ -169,14 +166,22 @@ public class HotelDAOImpl implements HotelDAO {
                 hotelAddress.setCountryId(resultSet.getInt("country_id"));
                 hotelAddress.setCityId(resultSet.getInt("city_id"));
                 hotel.setHotelAddress(hotelAddress);
-
-                hotels.add(hotel);
+                String cityName = resultSet.getString("city_name");
+                boolean hasCity = result.containsKey(cityName);
+                if (hasCity) {
+                    List<Hotel> hotels = result.get(cityName);
+                    hotels.add(hotel);
+                } else {
+                    List<Hotel> hotels = new ArrayList<>();
+                    hotels.add(hotel);
+                    result.put(cityName, hotels);
+                }
             }
 
-            return hotels;
+            return result;
         } catch (Exception exception) {
             System.err.println("error while searching for hotels " + exception.getMessage());
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
     }
 }

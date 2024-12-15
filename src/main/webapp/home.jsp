@@ -251,32 +251,28 @@
      %>
         <section class="hotel-list">
             <%
-                Map<List<Hotel>, List<Country>> hotelsMap = (Map<List<Hotel>, List<Country>>) request.getAttribute("hotels");
+                String countryName = (String) request.getAttribute("countryName");
+                Map<String, List<Hotel>> hotelsMap = (Map<String, List<Hotel>>) request.getAttribute("hotels");
 
-                for (Map.Entry<List<Hotel>, List<Country>> entry : hotelsMap.entrySet()) {
-                    List<Hotel> hotels = entry.getKey();
-                    List<Country> countryCity = entry.getValue();
-                    int i = 0;
-                    for (Hotel hotel : hotels) {
+                for (Map.Entry<String, List<Hotel>> entry : hotelsMap.entrySet()) {
+                    String city = entry.getKey();
+                    List<Hotel> hotelList = entry.getValue();
+
+                    for (Hotel hotel : hotelList) {
                         HotelAddress hotelAddress = hotel.getHotelAddress();
-                        Country country = countryCity.get(i);
-                        City city = country.getCities().get(0);
 
-                        String cityName = city.getName();
-                        String countryName = country.getName();
             %>
                         <div class="hotel-card">
                             <img src="https://via.placeholder.com/300x200" alt="Hotel Image">
                             <div class="hotel-info">
                                 <div class="hotel-name"><%= hotel.getName() %></div>
-                                <div class="hotel-location"><%= cityName %>, <%= countryName %></div>
+                                <div class="hotel-location"><%= city %>, <%= countryName %></div>
                                 <div class="hotel-price">$120 per night</div>
                                 <!-- View Details Button -->
                                 <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>" class="view-details-btn">View Details</a>
                             </div>
                         </div>
             <%
-                     i++;
                     }
                 }
             %>
