@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<%@ page import="org.hotels.models.Country" %>
+<%@ page import="org.hotels.models.City" %>
+<%@ page import="org.hotels.models.Hotel" %>
+<%@ page import="org.hotels.models.HotelAddress" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -206,9 +214,14 @@
         <div>
             <label for="destination">Hotel</label>
             <select id="destination" name="destination">
-                <option>Poland</option>
-                <option>Romania</option>
-                <option>Slovakia</option>
+            <%
+                List<Country> countries = (List<Country>) request.getAttribute("allCountries");
+                for (Country country : countries) {
+            %>
+                <option><%=country.getName()%></option>
+            <%
+                }
+            %>
             </select>
         </div>
 
@@ -233,32 +246,46 @@
         <button type="submit">Search</button>
     </form>
 
-    <% if(request.getAttribute("post") != null){ %>
-    <!-- Hotel List Section -->
-    <section class="hotel-list">
-        <div class="hotel-card">
-            <img src="https://via.placeholder.com/300x200" alt="Hotel Image">
-            <div class="hotel-info">
-                <div class="hotel-name">Hotel Warsaw</div>
-                <div class="hotel-location">Warsaw, Poland</div>
-                <div class="hotel-price">$120 per night</div>
-                <!-- View Details Button -->
-                <a href="http://localhost:8080/hotels/hotel?hotelId=1" class="view-details-btn">View Details</a>
-            </div>
-        </div>
-        <div class="hotel-card">
-            <img src="https://via.placeholder.com/300x200" alt="Hotel Image">
-            <div class="hotel-info">
-                <div class="hotel-name">Hotel Bucharest</div>
-                <div class="hotel-location">Bucharest, Romania</div>
-                <div class="hotel-price">$110 per night</div>
-                <!-- View Details Button -->
-                <a href="http://localhost:8080/hotels/hotel?hotelId=2" class="view-details-btn">View Details</a>
-            </div>
-        </div>
-        <!-- Add more hotel cards as needed -->
-    </section>
-    <% } %>
+     <%
+            if("POST".equalsIgnoreCase(request.getMethod())){
+     %>
+        <section class="hotel-list">
+            <%
+                Map<List<Hotel>, List<Country>> hotelsMap = (Map<List<Hotel>, List<Country>>) request.getAttribute("hotels");
+
+                for (Map.Entry<List<Hotel>, List<Country>> entry : hotelsMap.entrySet()) {
+                    List<Hotel> hotels = entry.getKey();
+                    List<Country> countryCity = entry.getValue();
+                    int i = 0;
+                    for (Hotel hotel : hotels) {
+                        HotelAddress hotelAddress = hotel.getHotelAddress();
+                        Country country = countryCity.get(i);
+                        City city = country.getCities().get(0);
+
+                        String cityName = city.getName();
+                        String countryName = country.getName();
+            %>
+                        <div class="hotel-card">
+                            <img src="https://via.placeholder.com/300x200" alt="Hotel Image">
+                            <div class="hotel-info">
+                                <div class="hotel-name"><%= hotel.getName() %></div>
+                                <div class="hotel-location"><%= cityName %>, <%= countryName %></div>
+                                <div class="hotel-price">$120 per night</div>
+                                <!-- View Details Button -->
+                                <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>" class="view-details-btn">View Details</a>
+                            </div>
+                        </div>
+            <%
+                     i++;
+                    }
+                }
+            %>
+        </section>
+
+     <%
+         }
+     %>
+
 
     <footer>
         &copy; 2024 Trivago. All Rights Reserved.

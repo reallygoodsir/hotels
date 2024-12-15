@@ -5,11 +5,16 @@ import org.hotels.models.Country;
 import org.hotels.models.Street;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CountryDAOImpl implements CountryDAO {
-    private static final String SELECT_COUNTRY = "select * from country " +
+    private static final String SELECT_ALL_COUNTRIES = "select name from hotels_db.country";
+    private static final String SELECT_COUNTRY_BY_NAME = "select * from country " +
             "where name = ?";
+    private static final String SELECT_COUNTRY_BY_ID = "select name from country " +
+            "where country_id = ?";
     private static final String INSERT_COUNTRY = "insert into country " +
             "(name) " +
             "values(?)";
@@ -24,13 +29,14 @@ public class CountryDAOImpl implements CountryDAO {
             "(city_id, name) " +
             "values(?, ?)";
 
+
     public boolean create(Country country) {
         try (
                 Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)
         ) {
             connection.setAutoCommit(false);
             int countryId = 0;
-            try (PreparedStatement stmtSelectCountry = connection.prepareStatement(SELECT_COUNTRY)) {
+            try (PreparedStatement stmtSelectCountry = connection.prepareStatement(SELECT_COUNTRY_BY_NAME)) {
                 stmtSelectCountry.setString(1, country.getName());
                 try (ResultSet resultSet = stmtSelectCountry.executeQuery()) {
                     if (resultSet.next()) {
@@ -119,10 +125,29 @@ public class CountryDAOImpl implements CountryDAO {
     }
 
     @Override
+    public List<Country> getAllCountries() {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
+             PreparedStatement stmtSelectAllCountries = connection.prepareStatement(SELECT_ALL_COUNTRIES)) {
+
+            ResultSet resultSet = stmtSelectAllCountries.executeQuery();
+            List<Country> countries = new ArrayList<>();
+            while (resultSet.next()) {
+                Country country = new Country();
+                country.setName(resultSet.getString("name"));
+                countries.add(country);
+            }
+            return countries;
+        } catch (Exception exception) {
+            System.err.println("Error while getting all countries " + exception.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public int getByName(String name) {
         try (
                 Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-                PreparedStatement stmtSelectStreet = connection.prepareStatement(SELECT_COUNTRY)
+                PreparedStatement stmtSelectStreet = connection.prepareStatement(SELECT_COUNTRY_BY_NAME)
         ) {
             stmtSelectStreet.setString(1, name);
             ResultSet resultSet = stmtSelectStreet.executeQuery();
@@ -133,6 +158,24 @@ public class CountryDAOImpl implements CountryDAO {
         } catch (Exception exception) {
             System.err.println("countrydao error " + exception.getMessage());
             return -1;
+        }
+    }
+
+    @Override
+    public String getById(int id) {
+        try (
+                Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
+                PreparedStatement stmtSelectStreet = connection.prepareStatement(SELECT_COUNTRY_BY_ID)
+        ) {
+            stmtSelectStreet.setInt(1, id);
+            ResultSet resultSet = stmtSelectStreet.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            }
+            throw new Exception("country doesnt exist");
+        } catch (Exception exception) {
+            System.err.println("citydao error " + exception.getMessage());
+            return null;
         }
     }
 }
