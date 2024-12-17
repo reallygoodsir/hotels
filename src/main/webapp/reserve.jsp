@@ -105,18 +105,19 @@
             <input type="email" id="email" name="email" required>
 
             <!-- Phone Number Field -->
-            <label for="phone_number">Phone Number:</label>
-            <input type="tel" id="phone_number" name="phone_number" required>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" required>
 
             <!-- Name Field -->
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="name" name="name" required
+                   pattern="[A-Za-z0-9\s\.,'-]+">
+
 
             <!-- Hidden Inputs for Room and Hotel IDs -->
-            <input type="hidden" name="room_id" value="${room_id}"> <!-- Add dynamic room_id here -->
-            <input type="hidden" name="hotel_id" value="${hotel_id}"> <!-- Add dynamic hotel_id here -->
-            <input type="hidden" name="price" value="150"> <!-- Room price dynamically, can be passed from backend -->
-
+            <input type="hidden" name="hotelId" value="<%= request.getParameter("hotelId") %>">
+            <input type="hidden" name="roomId" value="<%= request.getParameter("roomId") %>">
+            <input type="hidden" name="roomPrice" value="<%= request.getParameter("roomPrice") %>">
             <!-- Confirm Reservation Button -->
             <button type="submit">Confirm Reserve</button>
         </form>

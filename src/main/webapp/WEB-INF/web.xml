@@ -7,6 +7,9 @@
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>
+    <session-config>
+        <session-timeout>180</session-timeout>
+    </session-config>
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
         <servlet-class>org.hotels.servlets.HomeServlet</servlet-class>

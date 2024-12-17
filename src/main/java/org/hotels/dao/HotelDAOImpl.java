@@ -6,8 +6,16 @@ import java.sql.*;
 import java.util.*;
 
 public class HotelDAOImpl implements HotelDAO {
+    private static final String SELECT_HOTEL = "select " +
+            "hotel.name as hotel_name, " +
+            "hotel_info.details as details " +
+            "from hotel hotel " +
+            "join hotel_info hotel_info " +
+            "on hotel.hotel_id = hotel_info.hotel_id " +
+            "where hotel.hotel_id = ?";
     private static final String SEARCH_FOR_HOTELS =
-            "select distinct hotel.hotel_id, hotel.name as hotel_name, " +
+            "select distinct hotel.hotel_id as hotel_id, " +
+                    "hotel.name as hotel_name, " +
                     "city.city_id as city_id, " +
                     "city.name as city_name, " +
                     "country.country_id as country_id " +
@@ -26,8 +34,6 @@ public class HotelDAOImpl implements HotelDAO {
                     "and room_info.children_capacity = ? and room.is_available = 1 " +
                     "order by city.name";
 
-
-    //    private static final String SELECT_HOTEL = "select hotel.name from hotel where name = ?"
     private static final String INSERT_HOTEL = "insert into hotel " +
             "(name) " +
             "values(?)";
@@ -161,6 +167,7 @@ public class HotelDAOImpl implements HotelDAO {
 
             while (resultSet.next()) {
                 Hotel hotel = new Hotel();
+                hotel.setId(resultSet.getInt("hotel_id"));
                 hotel.setName(resultSet.getString("hotel_name"));
                 HotelAddress hotelAddress = new HotelAddress();
                 hotelAddress.setCountryId(resultSet.getInt("country_id"));
@@ -182,6 +189,30 @@ public class HotelDAOImpl implements HotelDAO {
         } catch (Exception exception) {
             System.err.println("error while searching for hotels " + exception.getMessage());
             return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public Optional<Hotel> getHotel(int id) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
+             PreparedStatement stmtSelectHotel = connection.prepareStatement(SELECT_HOTEL)) {
+            stmtSelectHotel.setInt(1, id);
+            ResultSet resultSet = stmtSelectHotel.executeQuery();
+            if (resultSet.next()) {
+                Hotel hotel = new Hotel();
+                hotel.setId(id);
+                hotel.setName(resultSet.getString("hotel_name"));
+
+                HotelInfo hotelInfo = new HotelInfo();
+                hotelInfo.setDetails(resultSet.getString("details"));
+                hotel.setHotelInfo(hotelInfo);
+                return Optional.of(hotel);
+            } else {
+                throw new Exception("Couldn't get a hotel");
+            }
+        } catch (Exception exception) {
+            System.err.println("Error while trying to get hotel with the id " + id + "\n" + exception.getMessage());
+            return Optional.empty();
         }
     }
 }

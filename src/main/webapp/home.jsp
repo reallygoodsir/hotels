@@ -267,9 +267,7 @@
                             <div class="hotel-info">
                                 <div class="hotel-name"><%= hotel.getName() %></div>
                                 <div class="hotel-location"><%= city %>, <%= countryName %></div>
-                                <div class="hotel-price">$120 per night</div>
-                                <!-- View Details Button -->
-                                <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>" class="view-details-btn">View Details</a>
+                                <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>&cityName=<%= city %>&countryName=<%= countryName %>" class="view-details-btn">View Details</a>
                             </div>
                         </div>
             <%

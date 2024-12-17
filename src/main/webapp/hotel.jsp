@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<%@ page import="org.hotels.models.Hotel" %>
+<%@ page import="org.hotels.models.HotelInfo" %>
+<%@ page import="org.hotels.models.RoomInfo" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.hotels.models.Room" %>
+<%@ page import="java.math.BigDecimal" %>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -160,62 +166,49 @@
     </header>
 
     <section class="hotel-info">
-        <!-- Hotel Image -->
         <img src="https://via.placeholder.com/1200x400" alt="Hotel Image" class="hotel-image">
 
-        <!-- Hotel Information -->
-        <div class="hotel-name">Hotel Warsaw</div>
-        <div class="hotel-location">Warsaw, Poland</div>
-        <div class="hotel-price">$120 per night</div>
+        <%
+            Hotel hotel = (Hotel) request.getAttribute("hotel");
+            HotelInfo hotelInfo = hotel.getHotelInfo();
+        %>
+        <div class="hotel-name"><%= hotel.getName() %></div>
+        <div class="hotel-location"><%= request.getParameter("cityName") %>, <%= request.getParameter("countryName") %></div>
         <div class="hotel-description">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean pharetra, velit nec sollicitudin ultricies, metus urna euismod sapien, non condimentum metus felis a dui.</p>
+            <p><%= hotelInfo.getDetails() %></p>
         </div>
     </section>
 
-    <!-- Rooms Section -->
+
     <section class="rooms-section">
         <h2>Rooms Available</h2>
         <div class="room-list">
-            <!-- Room 1 -->
-            <div class="room-card">
-                <img src="https://via.placeholder.com/300x200" alt="Room Image">
-                <div class="room-info">
-                    <div class="room-name">Deluxe Room</div>
-                    <div class="room-price">$150 per night</div>
-                    <form action="http://localhost:8080/hotels/room" method="GET">
-                        <input type="hidden" name="room_id" value="1"> <!-- Add unique room identifier -->
-                        <button type="submit">View Details</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Room 2 -->
-            <div class="room-card">
-                <img src="https://via.placeholder.com/300x200" alt="Room Image">
-                <div class="room-info">
-                    <div class="room-name">Standard Room</div>
-                    <div class="room-price">$100 per night</div>
-                    <form action="http://localhost:8080/hotels/room" method="GET">
-                        <input type="hidden" name="room_id" value="2"> <!-- Add unique room identifier -->
-                        <button type="submit">View Details</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Room 3 -->
-            <div class="room-card">
-                <img src="https://via.placeholder.com/300x200" alt="Room Image">
-                <div class="room-info">
-                    <div class="room-name">Suite</div>
-                    <div class="room-price">$200 per night</div>
-                    <form action="http://localhost:8080/hotels/room" method="GET">
-                        <input type="hidden" name="room_id" value="3"> <!-- Add unique room identifier -->
-                        <button type="submit">View Details</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Add more room cards as needed -->
+            <!-- Rooms Loop -->
+            <%
+                List<Room> hotelRooms = (List<Room>) request.getAttribute("hotelRooms");
+                for(Room room : hotelRooms){
+                    RoomInfo roomInfo = room.getRoomInfo();
+                    BigDecimal bigDecimalPrice = roomInfo.getPricePerNight();
+                    float price = bigDecimalPrice.floatValue();
+            %>
+                    <div class="room-card">
+                        <img src="https://via.placeholder.com/300x200" alt="Room Image">
+                        <div class="room-info">
+                            <div class="room-name"><%= roomInfo.getRoomType() %> Room</div>
+                            <div class="room-price">$<%= price %> per night</div>
+                            <form action="http://localhost:8080/hotels/room" method="GET">
+                                <input type="hidden" name="hotelId" value="<%= hotel.getId() %>">
+                                <input type="hidden" name="roomId" value="<%= room.getId() %>">
+                                <input type="hidden" name="roomType" value="<%= roomInfo.getRoomType() %>">
+                                <input type="hidden" name="roomPrice" value="<%= price %>">
+                                <input type="hidden" name="roomDetails" value="<%= roomInfo.getDetails() %>">
+                                <button type="submit">View Details</button>
+                            </form>
+                        </div>
+                    </div>
+            <%
+                }
+            %>
         </div>
     </section>
 

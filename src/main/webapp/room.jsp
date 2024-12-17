@@ -110,18 +110,18 @@
         <img src="https://via.placeholder.com/1200x400" alt="Room Image" class="room-image">
 
         <!-- Room Details -->
-        <div class="room-name">Deluxe Room</div>
-        <div class="room-price">$150 per night</div>
+        <div class="room-name"><%= request.getParameter("roomType") %> Room</div>
+        <div class="room-price">$<%= request.getParameter("roomPrice") %> per night</div>
         <div class="room-description">
-            <p>This spacious and luxurious room includes a king-sized bed, an en-suite bathroom, and a stunning view of the city. Perfect for a relaxing stay with all the amenities you need for a comfortable experience.</p>
+            <p><%= request.getParameter("roomDetails") %></p>
         </div>
     </section>
 
     <!-- Reserve Button -->
     <form action="http://localhost:8080/hotels/reserve" method="POST">
-        <input type="hidden" name="room_id" value="${room_id}"> <!-- Add room_id dynamically -->
-        <input type="hidden" name="hotel_id" value="${hotel_id}"> <!-- Add hotel_id dynamically -->
-        <input type="hidden" name="price" value="150"> <!-- Room price dynamically, can be passed from backend -->
+        <input type="hidden" name="hotelId" value="<%= request.getParameter("hotelId") %>">
+        <input type="hidden" name="roomId" value="<%= request.getParameter("roomId") %>">
+        <input type="hidden" name="roomPrice" value="<%= request.getParameter("roomPrice") %>">
         <button type="submit" class="reserve-button">Reserve</button>
     </form>
 
