@@ -169,7 +169,7 @@
         <img src="https://via.placeholder.com/1200x400" alt="Hotel Image" class="hotel-image">
 
         <%
-            Hotel hotel = (Hotel) request.getAttribute("hotel");
+            Hotel hotel = (Hotel) session.getAttribute("hotel");
             HotelInfo hotelInfo = hotel.getHotelInfo();
         %>
         <div class="hotel-name"><%= hotel.getName() %></div>
@@ -185,7 +185,7 @@
         <div class="room-list">
             <!-- Rooms Loop -->
             <%
-                List<Room> hotelRooms = (List<Room>) request.getAttribute("hotelRooms");
+                List<Room> hotelRooms = (List<Room>) session.getAttribute("hotelRooms");
                 for(Room room : hotelRooms){
                     RoomInfo roomInfo = room.getRoomInfo();
                     BigDecimal bigDecimalPrice = roomInfo.getPricePerNight();
@@ -197,11 +197,7 @@
                             <div class="room-name"><%= roomInfo.getRoomType() %> Room</div>
                             <div class="room-price">$<%= price %> per night</div>
                             <form action="http://localhost:8080/hotels/room" method="GET">
-                                <input type="hidden" name="hotelId" value="<%= hotel.getId() %>">
                                 <input type="hidden" name="roomId" value="<%= room.getId() %>">
-                                <input type="hidden" name="roomType" value="<%= roomInfo.getRoomType() %>">
-                                <input type="hidden" name="roomPrice" value="<%= price %>">
-                                <input type="hidden" name="roomDetails" value="<%= roomInfo.getDetails() %>">
                                 <button type="submit">View Details</button>
                             </form>
                         </div>

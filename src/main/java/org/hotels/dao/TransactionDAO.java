@@ -1,9 +1,12 @@
 package org.hotels.dao;
 
+import org.hotels.models.Customer;
+import org.hotels.models.Transaction;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public interface TransactionDAO extends GeneralDAO{
-    void executeTransaction(BigDecimal totalPrice, Date checkIn, Date checkOut,
-                            int customerId, int hotelId, int roomId);
+
+    void executeTransaction(Customer customer, Transaction transaction);
 }

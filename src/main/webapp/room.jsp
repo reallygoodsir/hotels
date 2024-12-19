@@ -110,18 +110,15 @@
         <img src="https://via.placeholder.com/1200x400" alt="Room Image" class="room-image">
 
         <!-- Room Details -->
-        <div class="room-name"><%= request.getParameter("roomType") %> Room</div>
-        <div class="room-price">$<%= request.getParameter("roomPrice") %> per night</div>
+        <div class="room-name"><%= session.getAttribute("roomType") %> Room</div>
+        <div class="room-price">$<%= session.getAttribute("roomPrice") %> per night</div>
         <div class="room-description">
-            <p><%= request.getParameter("roomDetails") %></p>
+            <p><%= session.getAttribute("roomDetails") %></p>
         </div>
     </section>
 
     <!-- Reserve Button -->
     <form action="http://localhost:8080/hotels/reserve" method="POST">
-        <input type="hidden" name="hotelId" value="<%= request.getParameter("hotelId") %>">
-        <input type="hidden" name="roomId" value="<%= request.getParameter("roomId") %>">
-        <input type="hidden" name="roomPrice" value="<%= request.getParameter("roomPrice") %>">
         <button type="submit" class="reserve-button">Reserve</button>
     </form>
 

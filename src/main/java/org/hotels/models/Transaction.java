@@ -11,6 +11,15 @@ public class Transaction {
     private Date checkIn;
     private Date checkOut;
 
+    public Transaction() {}
+    public Transaction(int roomId, int hotelId,  BigDecimal totalPrice, Date checkIn, Date checkOut) {
+        this.roomId = roomId;
+        this.hotelId = hotelId;
+        this.totalPrice = totalPrice;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+    }
+
     public int getRoomId() {
         return roomId;
     }

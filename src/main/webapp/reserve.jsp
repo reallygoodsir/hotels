@@ -113,11 +113,6 @@
             <input type="text" id="name" name="name" required
                    pattern="[A-Za-z0-9\s\.,'-]+">
 
-
-            <!-- Hidden Inputs for Room and Hotel IDs -->
-            <input type="hidden" name="hotelId" value="<%= request.getParameter("hotelId") %>">
-            <input type="hidden" name="roomId" value="<%= request.getParameter("roomId") %>">
-            <input type="hidden" name="roomPrice" value="<%= request.getParameter("roomPrice") %>">
             <!-- Confirm Reservation Button -->
             <button type="submit">Confirm Reserve</button>
         </form>
