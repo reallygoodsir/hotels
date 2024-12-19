@@ -252,7 +252,7 @@
         <section class="hotel-list">
             <%
                 String countryName = (String) request.getAttribute("countryName");
-                Map<String, List<Hotel>> hotelsMap = (Map<String, List<Hotel>>) request.getAttribute("hotels");
+                Map<String, List<Hotel>> hotelsMap = (Map<String, List<Hotel>>) session.getAttribute("hotels");
 
                 for (Map.Entry<String, List<Hotel>> entry : hotelsMap.entrySet()) {
                     String city = entry.getKey();

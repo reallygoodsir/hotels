@@ -6,6 +6,15 @@ public class Room {
     private String roomNumber;
     private boolean isAvailable;
     private RoomInfo roomInfo;
+    private boolean isReserved;
+
+    public boolean isReserved() {
+        return isReserved;
+    }
+
+    public void setReserved(boolean reserved) {
+        isReserved = reserved;
+    }
 
     public int getId() {
         return id;

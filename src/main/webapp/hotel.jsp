@@ -186,23 +186,25 @@
             <!-- Rooms Loop -->
             <%
                 List<Room> hotelRooms = (List<Room>) session.getAttribute("hotelRooms");
-                for(Room room : hotelRooms){
-                    RoomInfo roomInfo = room.getRoomInfo();
-                    BigDecimal bigDecimalPrice = roomInfo.getPricePerNight();
-                    float price = bigDecimalPrice.floatValue();
+                if(!hotelRooms.isEmpty()){
+                    for(Room room : hotelRooms){
+                        RoomInfo roomInfo = room.getRoomInfo();
+                        BigDecimal bigDecimalPrice = roomInfo.getPricePerNight();
+                        float price = bigDecimalPrice.floatValue();
             %>
-                    <div class="room-card">
-                        <img src="https://via.placeholder.com/300x200" alt="Room Image">
-                        <div class="room-info">
-                            <div class="room-name"><%= roomInfo.getRoomType() %> Room</div>
-                            <div class="room-price">$<%= price %> per night</div>
-                            <form action="http://localhost:8080/hotels/room" method="GET">
-                                <input type="hidden" name="roomId" value="<%= room.getId() %>">
-                                <button type="submit">View Details</button>
-                            </form>
+                        <div class="room-card">
+                            <img src="https://via.placeholder.com/300x200" alt="Room Image">
+                            <div class="room-info">
+                                <div class="room-name"><%= roomInfo.getRoomType() %> Room</div>
+                                <div class="room-price">$<%= price %> per night</div>
+                                <form action="http://localhost:8080/hotels/room" method="GET">
+                                    <input type="hidden" name="roomId" value="<%= room.getId() %>">
+                                    <button type="submit">View Details</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
             <%
+                    }
                 }
             %>
         </div>

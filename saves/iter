@@ -1,0 +1,9 @@
+ for (List<Hotel> hotelList : hotels.values()) {
+    for (Hotel hotel : hotelList) {
+        for (Room room : unreservedRooms) {
+            if (hotel.getId() == room.getHotelId()) {
+                hotel.getRooms().add(room);
+            }
+        }
+    }
+}

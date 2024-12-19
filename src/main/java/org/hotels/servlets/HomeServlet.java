@@ -1,11 +1,9 @@
 package org.hotels.servlets;
 
-import org.hotels.dao.CountryDAO;
-import org.hotels.dao.CountryDAOImpl;
-import org.hotels.dao.HotelDAO;
-import org.hotels.dao.HotelDAOImpl;
+import org.hotels.dao.*;
 import org.hotels.models.Country;
 import org.hotels.models.Hotel;
+import org.hotels.models.Room;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -18,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -46,13 +45,15 @@ public class HomeServlet extends HttpServlet {
 
             String checkInString = req.getParameter("check_in");
             String checkOutString = req.getParameter("check_out");
+            Date checkIn = new Date();
+            Date checkOut = new Date();
+            HttpSession session = req.getSession(true);
             if (!checkInString.isEmpty() && !checkOutString.isEmpty() && !countryName.isEmpty()
                     && !childrenCapacityParameter.isEmpty() && !adultCapacityParameter.isEmpty()) {
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date checkIn = dateFormat.parse(checkInString);
-                Date checkOut = dateFormat.parse(checkOutString);
-                HttpSession session = req.getSession(true);
+                checkIn = dateFormat.parse(checkInString);
+                checkOut = dateFormat.parse(checkOutString);
 
                 LocalDate checkInLocalDate = checkIn.toInstant()
                         .atZone(ZoneId.systemDefault())
@@ -72,19 +73,55 @@ public class HomeServlet extends HttpServlet {
                 session.setAttribute("adults", Integer.parseInt(req.getParameter("adults")));
             } else {
                 // code telling the person that not everything has been entered
+                session.invalidate();
                 RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
                 dispatcher.forward(req, resp);
             }
 
+            RoomDAO roomDAO = new RoomDAOImpl();
             HotelDAO hotelDAO = new HotelDAOImpl();
             Map<String, List<Hotel>> hotels = hotelDAO.searchForHotels(countryName, childrenCapacity, adultCapacity);
-            // check
+            List<Room> allRooms = new ArrayList<>();
+            for (List<Hotel> listHotel : hotels.values()) {
+                for (Hotel hotel : listHotel) {
+                    List<Room> rooms = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
+                    if (!rooms.isEmpty()) {
+                        hotel.setRooms(rooms);
+                        for (Room room : rooms) {
+                            room.setHotelId(hotel.getId());
+                            allRooms.add(room);
+                        }
+                    }
+                }
+            }
+            // verify the allRooms list availability in a separate method in room dao
+            List<Room> unreservedRooms = roomDAO.getUnreservedRooms(allRooms, checkIn, checkOut);
+
+            for (List<Hotel> hotelList : hotels.values()) {
+                for (Hotel hotel : hotelList) {
+                    // Clear all existing rooms in the hotel before adding the unreserved rooms
+                    hotel.getRooms().clear();
+
+                    // Add unreserved rooms to the hotel
+                    for (Room room : unreservedRooms) {
+                        if (hotel.getId() == room.getHotelId()) {
+                            hotel.getRooms().add(room);
+                        }
+                    }
+                }
+            }
+
+            for (List<Hotel> hotelList : hotels.values()) {
+                hotelList.removeIf(hotel -> hotel.getRooms().isEmpty());
+            }
+
             req.setAttribute("countryName", countryName);
-            req.setAttribute("hotels", hotels);
+            session.setAttribute("hotels", hotels);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {
             System.err.println("Error while in HomeServlet doPost " + exception.getMessage());
+            exception.printStackTrace();
         }
     }
 

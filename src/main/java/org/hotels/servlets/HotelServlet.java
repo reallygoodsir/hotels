@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class HotelServlet extends HttpServlet {
@@ -24,23 +25,39 @@ public class HotelServlet extends HttpServlet {
                 throw new Exception("session should be created");
             }
 
-            HotelDAO hotelDAO = new HotelDAOImpl();
             String hotelId = req.getParameter("hotelId");
-            Optional<Hotel> optionalHotel = hotelDAO.getHotel(Integer.parseInt(hotelId));
-            if (optionalHotel.isPresent()) {
-                Hotel hotel = optionalHotel.get();
-                session.setAttribute("hotel", hotel);
-                session.setAttribute("hotelId", hotel.getId());
-            }
             int adultCapacity = (int) session.getAttribute("adults");
             int childrenCapacity = (int) session.getAttribute("children");
-            RoomDAO roomDAO = new RoomDAOImpl();
-            List<Room> roomsForHotel = roomDAO.getRoomsForHotel(Integer.parseInt(hotelId), adultCapacity, childrenCapacity);
-            session.setAttribute("hotelRooms", roomsForHotel);
+
+            Map<String, List<Hotel>> hotelMap = (Map<String, List<Hotel>>) session.getAttribute("hotels");
+            for (List<Hotel> hotels : hotelMap.values()) {
+                for (Hotel hotel : hotels) {
+                    if(hotel.getId() == Integer.parseInt(hotelId)){
+                        List<Room> roomsForHotel = hotel.getRooms();
+                        HotelDAO hotelDAO = new HotelDAOImpl();
+                        Optional<Hotel> optionalHotel = hotelDAO.getHotel(hotel.getId());
+                        if(optionalHotel.isPresent()){
+                            hotel = optionalHotel.get();
+                        }else{
+                            throw new Exception("Hotel Id is supposed to be valid");
+                        }
+                        session.setAttribute("hotel", hotel);
+                        session.setAttribute("hotelId", hotel.getId());
+//                      RoomDAO roomDAO = new RoomDAOImpl();
+//                      List<Room> roomsForHotel = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
+                        session.setAttribute("hotelRooms", roomsForHotel);
+                        for (Room room : roomsForHotel) {
+                            System.out.println(room.getId());
+                            System.out.println(room.getRoomNumber());
+                        }
+                    }
+                }
+            }
 
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/hotel.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {
+            exception.printStackTrace();
             System.err.println("Error in hotel servlet" + exception.getMessage());
         }
     }

@@ -4,10 +4,7 @@ import org.hotels.models.Room;
 import org.hotels.models.RoomInfo;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +28,21 @@ public class RoomDAOImpl implements RoomDAO {
             "and room_info.adults_capacity = ? " +
             "and room_info.children_capacity = ?";
 
+    //        String VERIFY_ROOMS_AVAILABILITY = "select 1 " +
+//                "from transaction transaction " +
+//                "where transaction.room_id = ? " +
+//                "and transaction.check_in < ? " +
+//                "and transaction.check_out > ?";
+
+//    String VERIFY_ROOMS_AVAILABILITY = "SELECT 1 " +
+//            "FROM transaction transaction " +
+//            "WHERE transaction.room_id = ? " +
+//            "AND NOT (transaction.check_out <= ? OR transaction.check_in >= ?)";
+    String VERIFY_ROOMS_AVAILABILITY = "SELECT 1 " +
+            "FROM transaction transaction " +
+            "WHERE transaction.room_id = ? " +
+            "AND NOT (transaction.check_out <= ? OR transaction.check_in >= ?)";
+
     @Override
     public List<Room> getRoomsForHotel(int hotelId, int adultCapacity, int childrenCapacity) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
@@ -40,9 +52,9 @@ public class RoomDAOImpl implements RoomDAO {
             stmtSelectRooms.setInt(3, childrenCapacity);
             ResultSet resultSet = stmtSelectRooms.executeQuery();
             List<Room> rooms = new ArrayList<>();
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 int roomAvailable = resultSet.getInt("available");
-                if(roomAvailable == 1){
+                if (roomAvailable == 1) {
                     Room room = new Room();
                     room.setRoomNumber(resultSet.getString("room_number"));
                     room.setId(resultSet.getInt("room_id"));
@@ -59,9 +71,9 @@ public class RoomDAOImpl implements RoomDAO {
                     rooms.add(room);
                 }
             }
-            if(!rooms.isEmpty()){
+            if (!rooms.isEmpty()) {
                 return rooms;
-            }else {
+            } else {
                 System.out.println("no rooms for hotel with the id " + hotelId); // replace this with logger.warn
                 return Collections.emptyList();
             }
@@ -71,4 +83,32 @@ public class RoomDAOImpl implements RoomDAO {
             return Collections.emptyList();
         }
     }
+
+    @Override
+    public List<Room> getUnreservedRooms(List<Room> rooms, java.util.Date checkIn, java.util.Date checkOut) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
+            List<Room> availableRooms = new ArrayList<>();
+            for (Room room : rooms) {
+                try (PreparedStatement stmtVerifyRooms = connection.prepareStatement(VERIFY_ROOMS_AVAILABILITY)) {
+                    stmtVerifyRooms.setInt(1, room.getId());
+                    java.sql.Date sqlCheckIn = new java.sql.Date(checkIn.getTime());
+                    java.sql.Date sqlCheckOut = new java.sql.Date(checkOut.getTime());
+                    stmtVerifyRooms.setDate(2, sqlCheckIn);
+                    stmtVerifyRooms.setDate(3, sqlCheckOut);
+
+                    ResultSet resultSet = stmtVerifyRooms.executeQuery();
+
+                    if (!resultSet.next()) {
+                        availableRooms.add(room);
+                    }
+                }
+            }
+            return availableRooms;
+        } catch (Exception exception) {
+            System.err.println("Error while connecting to the database: " + exception.getMessage());
+            exception.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
 }
