@@ -81,12 +81,12 @@ public class HomeServlet extends HttpServlet {
             RoomDAO roomDAO = new RoomDAOImpl();
             HotelDAO hotelDAO = new HotelDAOImpl();
             Map<String, List<Hotel>> hotels = hotelDAO.searchForHotels(countryName, childrenCapacity, adultCapacity);
+
             List<Room> allRooms = new ArrayList<>();
             for (List<Hotel> listHotel : hotels.values()) {
                 for (Hotel hotel : listHotel) {
                     List<Room> rooms = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
                     if (!rooms.isEmpty()) {
-                        hotel.setRooms(rooms);
                         for (Room room : rooms) {
                             room.setHotelId(hotel.getId());
                             allRooms.add(room);
@@ -99,12 +99,12 @@ public class HomeServlet extends HttpServlet {
 
             for (List<Hotel> hotelList : hotels.values()) {
                 for (Hotel hotel : hotelList) {
-                    // Clear all existing rooms in the hotel before adding the unreserved rooms
-                    hotel.getRooms().clear();
-
-                    // Add unreserved rooms to the hotel
                     for (Room room : unreservedRooms) {
                         if (hotel.getId() == room.getHotelId()) {
+                            List<Room> rooms = hotel.getRooms();
+                            if (rooms == null) {
+                                hotel.setRooms(new ArrayList<>());
+                            }
                             hotel.getRooms().add(room);
                         }
                     }
@@ -112,7 +112,7 @@ public class HomeServlet extends HttpServlet {
             }
 
             for (List<Hotel> hotelList : hotels.values()) {
-                hotelList.removeIf(hotel -> hotel.getRooms().isEmpty());
+                hotelList.removeIf(hotel -> hotel.getRooms() == null || hotel.getRooms().isEmpty());
             }
 
             req.setAttribute("countryName", countryName);

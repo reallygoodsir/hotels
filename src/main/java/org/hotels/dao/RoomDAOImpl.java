@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoomDAOImpl implements RoomDAO {
     private static final String SELECT_ROOMS_FOR_HOTEL = "select  " +
@@ -28,20 +29,10 @@ public class RoomDAOImpl implements RoomDAO {
             "and room_info.adults_capacity = ? " +
             "and room_info.children_capacity = ?";
 
-    //        String VERIFY_ROOMS_AVAILABILITY = "select 1 " +
-//                "from transaction transaction " +
-//                "where transaction.room_id = ? " +
-//                "and transaction.check_in < ? " +
-//                "and transaction.check_out > ?";
-
-//    String VERIFY_ROOMS_AVAILABILITY = "SELECT 1 " +
-//            "FROM transaction transaction " +
-//            "WHERE transaction.room_id = ? " +
-//            "AND NOT (transaction.check_out <= ? OR transaction.check_in >= ?)";
-    String VERIFY_ROOMS_AVAILABILITY = "SELECT 1 " +
-            "FROM transaction transaction " +
-            "WHERE transaction.room_id = ? " +
-            "AND NOT (transaction.check_out <= ? OR transaction.check_in >= ?)";
+    private static final String VERIFY_ROOMS_AVAILABILITY = "SELECT distinct room_id " +
+            "FROM transaction " +
+            "WHERE room_id = ? " +
+            "AND (? <= check_out AND ? >= check_in)";
 
     @Override
     public List<Room> getRoomsForHotel(int hotelId, int adultCapacity, int childrenCapacity) {
@@ -86,6 +77,8 @@ public class RoomDAOImpl implements RoomDAO {
 
     @Override
     public List<Room> getUnreservedRooms(List<Room> rooms, java.util.Date checkIn, java.util.Date checkOut) {
+        List<Integer> roomIds = rooms.stream().map(Room::getId).collect(Collectors.toList());
+        System.out.println("Checking room ids " + roomIds + " checkIn " + checkIn + " checkOut " + checkOut);
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             List<Room> availableRooms = new ArrayList<>();
             for (Room room : rooms) {
@@ -97,12 +90,16 @@ public class RoomDAOImpl implements RoomDAO {
                     stmtVerifyRooms.setDate(3, sqlCheckOut);
 
                     ResultSet resultSet = stmtVerifyRooms.executeQuery();
-
                     if (!resultSet.next()) {
+                        System.out.println("Room is available. Adding room with id " + room.getId());
                         availableRooms.add(room);
+                    } else {
+                        System.out.println("Room is NOT available with id " + room.getId());
                     }
                 }
             }
+            List<Integer> availableRoomsIds = availableRooms.stream().map(Room::getId).collect(Collectors.toList());
+            System.out.println("Available rooms ids " + availableRoomsIds);
             return availableRooms;
         } catch (Exception exception) {
             System.err.println("Error while connecting to the database: " + exception.getMessage());
@@ -110,5 +107,4 @@ public class RoomDAOImpl implements RoomDAO {
             return Collections.emptyList();
         }
     }
-
 }
