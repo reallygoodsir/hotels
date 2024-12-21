@@ -118,7 +118,7 @@
     </section>
 
     <!-- Reserve Button -->
-    <form action="http://localhost:8080/hotels/reserve" method="POST">
+    <form action="http://localhost:8080/hotels/reserve" method="GET">
         <button type="submit" class="reserve-button">Reserve</button>
     </form>
 

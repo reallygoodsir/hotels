@@ -8,5 +8,5 @@ import java.util.Date;
 
 public interface TransactionDAO extends GeneralDAO{
 
-    void executeTransaction(Customer customer, Transaction transaction);
+    String executeTransaction(Customer customer, Transaction transaction);
 }

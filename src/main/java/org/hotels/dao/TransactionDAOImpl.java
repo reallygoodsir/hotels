@@ -4,6 +4,7 @@ import org.hotels.models.Customer;
 import org.hotels.models.Transaction;
 
 import java.sql.*;
+import java.util.UUID;
 
 public class TransactionDAOImpl implements TransactionDAO {
     private static final String SELECT_CUSTOMER = "select customer_id from customer " +
@@ -12,11 +13,11 @@ public class TransactionDAOImpl implements TransactionDAO {
             "(name, email, phone_number) " +
             "values (?, ?, ?)";
     private static final String INSERT_TRANSACTION = "insert into transaction " +
-            "(hotel_id, room_id, customer_id, total_price, check_in, check_out) " +
-            "values (?, ?, ?, ?, ?, ?)";
+            "(hotel_id, room_id, customer_id, total_price, check_in, check_out, confirmation_number) " +
+            "values (?, ?, ?, ?, ?, ?, ?)";
 
     @Override
-    public void executeTransaction(Customer customer, Transaction transaction) {
+    public String executeTransaction(Customer customer, Transaction transaction) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             try (PreparedStatement stmtSelectCustomer = connection.prepareStatement(SELECT_CUSTOMER)) {
 
@@ -45,6 +46,7 @@ public class TransactionDAOImpl implements TransactionDAO {
                     }
                 }
             }
+
             try (PreparedStatement stmtInsertTransaction = connection.prepareStatement(INSERT_TRANSACTION)) {
                 connection.setAutoCommit(false);
                 stmtInsertTransaction.setInt(1, transaction.getHotelId());
@@ -56,12 +58,16 @@ public class TransactionDAOImpl implements TransactionDAO {
                 stmtInsertTransaction.setDate(5, checkInSql);
                 java.sql.Date checkOutSql = new java.sql.Date(transaction.getCheckOut().getTime());
                 stmtInsertTransaction.setDate(6, checkOutSql);
+                UUID confirmationNumber = UUID.randomUUID();
+                stmtInsertTransaction.setString(7, confirmationNumber.toString());
                 stmtInsertTransaction.executeUpdate();
+                connection.commit();
+                return confirmationNumber.toString();
             }
-            connection.commit();
         } catch (Exception exception) {
             System.err.println("Error while trying to calculate the total price" + exception.getMessage());
             exception.printStackTrace();
+            return null;
         }
     }
 }

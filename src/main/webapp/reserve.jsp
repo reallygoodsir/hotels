@@ -99,23 +99,63 @@
     <!-- Reservation Form Section -->
     <section class="reservation-form">
         <h2>Confirm Your Reservation</h2>
-        <form action="http://localhost:8080/hotels/reserve-confirmation" method="POST">
-            <!-- Email Field -->
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+        <%
+            if(session.getAttribute("emailConfirmed") == null){
+        %>
+                <form action="http://localhost:8080/hotels/reserve" method="POST">
+                    <%
+                        String email = "";
+                        String sessionEmail = (String) session.getAttribute("email");
+                        if(sessionEmail != null){
+                            email = sessionEmail;
+                        }
+                    %>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<%= email %>" required>
 
-            <!-- Phone Number Field -->
-            <label for="phoneNumber">Phone Number:</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" required>
+                    <%
+                        String phoneNumber = "";
+                        String sessionPhoneNumber = (String) session.getAttribute("phoneNumber");
+                        if(sessionPhoneNumber != null){
+                            phoneNumber = sessionPhoneNumber;
+                        }
+                    %>
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber"
+                        value="<%= phoneNumber %>" required>
 
-            <!-- Name Field -->
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required
-                   pattern="[A-Za-z0-9\s\.,'-]+">
+                    <%
+                        String name = "";
+                        String sessionName = (String) session.getAttribute("name");
+                        if(sessionName != null){
+                            name = sessionName;
+                        }
+                    %>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="<%= name %>" required
+                           pattern="[A-Za-z0-9\s\.,'-]+">
 
-            <!-- Confirm Reservation Button -->
-            <button type="submit">Confirm Reserve</button>
-        </form>
+                    <button type="submit">Confirm Reserve</button>
+                </form>
+        <%
+            }
+            else {
+                String invalidEmailCode = (String) request.getAttribute("invalidEmailCode");
+                if(invalidEmailCode != null){
+        %>
+                    <h3>Incorrect verification code</h3>
+                <%
+                    }
+                %>
+                    <form action="http://localhost:8080/hotels/reserve-confirmation" method="POST">
+                        <label for="emailConfirmationCode">Enter the confirmation number sent to your email:</label>
+                        <input type="text" id="emailConfirmationCode" name="emailConfirmationCode" required
+                               pattern="\d{4}" maxlength="4" placeholder="1111">
+                        <button type="submit">Verify Code</button>
+                    </form>
+        <%
+            }
+        %>
     </section>
 
     <footer>

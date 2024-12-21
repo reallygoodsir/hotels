@@ -93,7 +93,8 @@
 
     <!-- Reservation Success Message -->
     <div class="success-message">
-        Reservation Successful!
+        Reservation Successful! <br>
+        Your confirmation number is <%= request.getAttribute("confirmationNumber") %>
     </div>
 
     <!-- Button to Return Home -->
