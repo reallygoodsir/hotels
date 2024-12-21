@@ -63,7 +63,9 @@
         }
 
         .reservation-form button {
-            width: 100%;
+           width: 150px;
+           display: block;
+           margin: 0 auto;
             padding: 10px;
             background-color: #007bff;
             color: white;
@@ -88,9 +90,9 @@
 </head>
 <body>
     <header>
-        <div class="logo">Trivago</div>
+        <div class="logo">Travel Agency</div>
         <nav>
-            <a href="#">Home</a>
+            <a href="http://localhost:8080/hotels/home">Home</a>
             <a href="#">About</a>
             <a href="#">Contact</a>
         </nav>
@@ -159,7 +161,7 @@
     </section>
 
     <footer>
-        &copy; 2024 Trivago. All Rights Reserved.
+        &copy; 2024 Travel Agency. All Rights Reserved.
     </footer>
 </body>
 </html>

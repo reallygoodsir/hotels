@@ -42,14 +42,9 @@ public class HotelServlet extends HttpServlet {
                             throw new Exception("Hotel Id is supposed to be valid");
                         }
                         session.setAttribute("hotel", hotel);
+                        session.setAttribute("hotelName", hotel.getName());
                         session.setAttribute("hotelId", hotel.getId());
-//                      RoomDAO roomDAO = new RoomDAOImpl();
-//                      List<Room> roomsForHotel = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
                         session.setAttribute("hotelRooms", roomsForHotel);
-                        for (Room room : roomsForHotel) {
-                            System.out.println(room.getId());
-                            System.out.println(room.getRoomNumber());
-                        }
                     }
                 }
             }

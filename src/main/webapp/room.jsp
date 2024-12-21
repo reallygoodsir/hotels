@@ -68,6 +68,7 @@
         }
 
         .reserve-button {
+            width: 150px;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -75,9 +76,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
-            width: 200px; /* Fixed width for the Reserve button */
+            width: 200px;
             text-align: center;
-            margin: 0 auto; /* Centering the button horizontally */
+            margin: 0 auto;
             display: block;
         }
 
@@ -96,9 +97,9 @@
 </head>
 <body>
     <header>
-        <div class="logo">Trivago</div>
+        <div class="logo">Travel Agency</div>
         <nav>
-            <a href="#">Home</a>
+            <a href="http://localhost:8080/hotels/home">Home</a>
             <a href="#">About</a>
             <a href="#">Contact</a>
         </nav>
@@ -107,13 +108,26 @@
     <!-- Room Information Section -->
     <section class="room-info">
         <!-- Room Image -->
-        <img src="https://via.placeholder.com/1200x400" alt="Room Image" class="room-image">
+        <%
+            String hotelName = (String) session.getAttribute("hotelName");
+            hotelName = hotelName.replace(" ", "-");
+            String roomNumber = (String) session.getAttribute("roomNumber");
+        %>
+        <img src="images/<%= hotelName %>_<%= roomNumber %>.png" alt="Room Image" class="room-image">
 
         <!-- Room Details -->
         <div class="room-name"><%= session.getAttribute("roomType") %> Room</div>
         <div class="room-price">$<%= session.getAttribute("roomPrice") %> per night</div>
         <div class="room-description">
             <p><%= session.getAttribute("roomDetails") %></p>
+            <%
+                boolean hasAirConditioning = (boolean) session.getAttribute("roomHasAirConditioning");
+                if(hasAirConditioning){
+            %>
+                    <p>Air Conditioning</p>
+            <%
+                }
+            %>
         </div>
     </section>
 
@@ -123,7 +137,7 @@
     </form>
 
     <footer>
-        &copy; 2024 Trivago. All Rights Reserved.
+        &copy; 2024 Travel Agency. All Rights Reserved.
     </footer>
 </body>
 </html>

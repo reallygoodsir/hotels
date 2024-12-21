@@ -49,7 +49,7 @@ public class EmailService {
     }
 
     public static void main(String[] args) {
-        String companyEmail = System.getenv("COMPANY_EMAIL");
-        System.out.println(companyEmail);
+        String adsd = "Aloft Harlem";
+        System.out.println(adsd.replace(" ", "-"));
     }
 }

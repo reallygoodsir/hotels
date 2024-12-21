@@ -8,7 +8,10 @@ import java.util.*;
 public class HotelDAOImpl implements HotelDAO {
     private static final String SELECT_HOTEL = "select " +
             "hotel.name as hotel_name, " +
-            "hotel_info.details as details " +
+            "hotel_info.details as details, " +
+            "hotel_info.has_parking as parking, " +
+            "hotel_info.has_wifi as wifi, " +
+            "hotel_info.has_swimming_pool as swimming_pool " +
             "from hotel hotel " +
             "join hotel_info hotel_info " +
             "on hotel.hotel_id = hotel_info.hotel_id " +
@@ -205,6 +208,9 @@ public class HotelDAOImpl implements HotelDAO {
 
                 HotelInfo hotelInfo = new HotelInfo();
                 hotelInfo.setDetails(resultSet.getString("details"));
+                hotelInfo.setHasWifi(resultSet.getBoolean("wifi"));
+                hotelInfo.setHasParking(resultSet.getBoolean("parking"));
+                hotelInfo.setHasSwimmingPool(resultSet.getBoolean("swimming_pool"));
                 hotel.setHotelInfo(hotelInfo);
                 return Optional.of(hotel);
             } else {

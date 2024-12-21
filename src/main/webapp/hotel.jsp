@@ -131,6 +131,9 @@
         }
 
         .room-card button {
+            width: 150px;
+            display: block;
+            margin: 0 auto;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -138,7 +141,6 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
-            width: 100%;
         }
 
         .room-card button:hover {
@@ -157,25 +159,46 @@
 </head>
 <body>
     <header>
-        <div class="logo">Trivago</div>
+        <div class="logo">Travel Agency</div>
         <nav>
-            <a href="#">Home</a>
+            <a href="http://localhost:8080/hotels/home">Home</a>
             <a href="#">About</a>
             <a href="#">Contact</a>
         </nav>
     </header>
 
     <section class="hotel-info">
-        <img src="https://via.placeholder.com/1200x400" alt="Hotel Image" class="hotel-image">
-
         <%
             Hotel hotel = (Hotel) session.getAttribute("hotel");
+            String hotelName = hotel.getName().replace(" ", "-");
             HotelInfo hotelInfo = hotel.getHotelInfo();
         %>
+        <img src="images/<%= hotelName %>.png" alt="Hotel Image" class="hotel-image">
         <div class="hotel-name"><%= hotel.getName() %></div>
         <div class="hotel-location"><%= request.getParameter("cityName") %>, <%= request.getParameter("countryName") %></div>
         <div class="hotel-description">
             <p><%= hotelInfo.getDetails() %></p>
+            <%
+                if(hotelInfo.isHasParking()){
+            %>
+                <p>Parking</p>
+            <%
+                }
+            %>
+            <%
+                if(hotelInfo.isHasWifi()){
+            %>
+                <p>Wifi</p>
+            <%
+                }
+            %>
+            <%
+                if(hotelInfo.isHasSwimmingPool()){
+            %>
+                <p>Swimming Pool</p>
+            <%
+                }
+            %>
         </div>
     </section>
 
@@ -193,12 +216,13 @@
                         float price = bigDecimalPrice.floatValue();
             %>
                         <div class="room-card">
-                            <img src="https://via.placeholder.com/300x200" alt="Room Image">
+                            <img src="images/<%= hotelName %>_<%= room.getRoomNumber() %>.png" alt="Room Image">
                             <div class="room-info">
                                 <div class="room-name"><%= roomInfo.getRoomType() %> Room</div>
                                 <div class="room-price">$<%= price %> per night</div>
                                 <form action="http://localhost:8080/hotels/room" method="GET">
                                     <input type="hidden" name="roomId" value="<%= room.getId() %>">
+                                    <input type="hidden" name="roomNumber" value="<%= room.getRoomNumber() %>">
                                     <button type="submit">View Details</button>
                                 </form>
                             </div>
@@ -211,7 +235,7 @@
     </section>
 
     <footer>
-        &copy; 2024 Trivago. All Rights Reserved.
+        &copy; 2024 Travel Agency. All Rights Reserved.
     </footer>
 </body>
 </html>

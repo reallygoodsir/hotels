@@ -19,6 +19,7 @@ public class RoomDAOImpl implements RoomDAO {
             "room.is_available as available," +
             "room_info.adults_capacity as max_adults, " +
             "room_info.children_capacity as max_children, " +
+            "room_info.has_air_conditioning as air_conditioning, " +
             "room_info.details as room_details " +
             "from room room " +
             "join hotel hotel " +
@@ -57,6 +58,7 @@ public class RoomDAOImpl implements RoomDAO {
                     roomInfo.setChildrenCapacity(resultSet.getInt("max_children"));
                     roomInfo.setRoomType(resultSet.getString("room_type"));
                     roomInfo.setPricePerNight(BigDecimal.valueOf(resultSet.getInt("price")));
+                    roomInfo.setHasAirConditioning(resultSet.getBoolean("air_conditioning"));
                     room.setRoomInfo(roomInfo);
 
                     rooms.add(room);

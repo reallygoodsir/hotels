@@ -114,7 +114,6 @@ public class HomeServlet extends HttpServlet {
             for (List<Hotel> hotelList : hotels.values()) {
                 hotelList.removeIf(hotel -> hotel.getRooms() == null || hotel.getRooms().isEmpty());
             }
-
             req.setAttribute("countryName", countryName);
             session.setAttribute("hotels", hotels);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");

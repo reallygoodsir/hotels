@@ -27,6 +27,9 @@ public class RoomServlet extends HttpServlet {
                     session.setAttribute("roomType", roomInfo.getRoomType());
                     session.setAttribute("roomDetails", roomInfo.getDetails());
                     session.setAttribute("roomPrice", roomInfo.getPricePerNight());
+                    session.setAttribute("roomNumber", room.getRoomNumber());
+                    session.setAttribute("roomHasAirConditioning", roomInfo.isHasAirConditioning());
+                    System.out.println("\n\n\n\n\n" + roomInfo.isHasAirConditioning());
                     break;
                 }
             }

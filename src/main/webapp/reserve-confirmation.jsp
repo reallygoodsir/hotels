@@ -12,7 +12,6 @@
             background-color: #f5f5f5;
         }
 
-        /* Trivago Header */
         header {
             background-color: #003580;
             color: white;
@@ -51,8 +50,9 @@
 
         /* Return to Home Button */
         .home-button {
+            width: 150px;
             display: block;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -81,9 +81,8 @@
     </style>
 </head>
 <body>
-    <!-- Trivago Header -->
     <header>
-        <div class="logo">Trivago</div>
+        <div class="logo">Travel Agency</div>
         <nav>
             <a href="http://localhost:8080/hotels/home">Home</a>
             <a href="#">About</a>
@@ -102,7 +101,7 @@
 
     <!-- Footer Section -->
     <footer>
-        &copy; 2024 Trivago. All Rights Reserved.
+        &copy; 2024 Travel Agency. All Rights Reserved.
     </footer>
 </body>
 </html>
