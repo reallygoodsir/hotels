@@ -44,7 +44,7 @@
         .hero {
             text-align: center;
             padding: 50px 20px;
-            background: url('https://via.placeholder.com/1920x500') no-repeat center center/cover;
+            background: url('images/homeHeader.png') no-repeat center center/cover;
             color: white;
         }
 
