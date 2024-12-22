@@ -62,12 +62,12 @@
            display: flex;
            justify-content: center;
            align-items: center;
-           gap: 50px; /* Increased gap to 50px */
+           gap: 50px;
            background-color: white;
            padding: 10px 20px;
            border-radius: 10px;
            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-           max-width: 900px; /* Adjusted width for better layout */
+           max-width: 900px;
            margin: 0 auto;
            margin-top: 20px;
        }
@@ -93,14 +93,12 @@
            border-radius: 5px;
        }
 
-       /* Increased width for hotel selection div */
        .search-bar div:first-child {
-           width: 200px; /* Adjusted width for better visibility */
+           width: 200px;
        }
 
-       /* Increased width for Adults and Children divs */
        .search-bar div:nth-child(4), .search-bar div:nth-child(5) {
-           width: 150px; /* Adjusted width for better visibility */
+           width: 150px;
        }
 
        .search-bar button {
@@ -128,10 +126,9 @@
            margin-top: 20px;
        }
 
-       /* Hotel List Section - Updated for Vertical Layout */
        .hotel-list {
            display: grid;
-           grid-template-columns: 1fr; /* Single column for vertical layout */
+           grid-template-columns: 1fr;
            gap: 20px;
            margin: 30px auto;
            max-width: 1200px;
@@ -194,22 +191,33 @@
        .hotel-card a:hover {
            background-color: #0056b3;
        }
-        .view-details {
-            width: 150px; /* Fixed width */
-            display: block; /* Ensures block-level behavior for centering */
-            margin: 10px auto; /* Centers the button horizontally with some vertical spacing */
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-align: center; /* Ensures text alignment */
-            border: none; /* Removes border styling */
-            cursor: pointer; /* Changes the cursor on hover */
-        }
 
+       .view-details {
+           width: 150px;
+           display: block;
+           margin: 10px auto;
+           padding: 10px;
+           background-color: #007bff;
+           color: white;
+           text-decoration: none;
+           border-radius: 5px;
+           font-size: 1rem;
+           text-align: center;
+           border: none;
+           cursor: pointer;
+       }
 
+       .error-label {
+           background-color: #ffe5e5;
+           color: #d8000c;
+           padding: 10px;
+           border-radius: 5px;
+           margin: 10px auto;
+           text-align: center;
+           font-size: 1rem;
+           max-width: 500px;
+           box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+       }
     </style>
 </head>
 <body>
@@ -227,44 +235,98 @@
         <p>Compare prices across hundreds of booking sites</p>
     </section>
 
-    <!-- Form to handle hotel search -->
+    <%
+        String checkIn = (String) session.getAttribute("checkIn");
+        checkIn = (checkIn == null) ? "2024-01-17" : checkIn;
+        String checkOut = (String) session.getAttribute("checkOut");
+        checkOut = (checkOut == null) ? "2024-01-24" : checkOut;
+
+        Integer children = (Integer) session.getAttribute("children");
+        children = (children == null) ? 0 : children;
+        Integer adults = (Integer) session.getAttribute("adults");
+        adults = (adults == null) ? 1 : adults;
+
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            String checkInError = (String) session.getAttribute("checkInError");
+            String checkOutError = (String) session.getAttribute("checkOutError");
+            String childrenCapacityError = (String) session.getAttribute("childrenCapacityError");
+            String adultCapacityError = (String) session.getAttribute("adultCapacityError");
+            String dayDistanceTooShort = (String) session.getAttribute("dayDistanceTooShort");
+            String checkInBeforeCheckOut = (String) session.getAttribute("checkInBeforeCheckOut");
+
+            if (checkInError != null) {
+    %>
+        <div class="error-label">No check-in provided</div>
+    <%
+            }
+            if (dayDistanceTooShort != null) {
+    %>
+        <div class="error-label">Your stay duration can't be under a day</div>
+    <%
+            }
+            if (checkInBeforeCheckOut != null) {
+    %>
+        <div class="error-label">Check-in can't be before check-out</div>
+    <%
+            }
+            if (checkOutError != null) {
+    %>
+        <div class="error-label">No check-out provided</div>
+    <%
+            }
+            if (childrenCapacityError != null) {
+    %>
+        <div class="error-label">Children can't be below 0</div>
+    <%
+            }
+            if (adultCapacityError != null) {
+    %>
+        <div class="error-label">Adults can't be below 1</div>
+    <%
+            }
+        }
+        session.removeAttribute("checkInError");
+        session.removeAttribute("checkOutError");
+        session.removeAttribute("childrenCapacityError");
+        session.removeAttribute("adultCapacityError");
+        session.removeAttribute("dayDistanceTooShort");
+        session.removeAttribute("checkInBeforeCheckOut");
+    %>
+
     <form action="http://localhost:8080/hotels/home" method="POST" class="search-bar">
         <div>
             <label for="destination">Hotel</label>
             <select id="destination" name="destination">
-            <%
-                List<Country> countries = (List<Country>) request.getAttribute("allCountries");
-                for (Country country : countries) {
-            %>
+                <%
+                    List<Country> countries = (List<Country>) request.getAttribute("allCountries");
+                    for (Country country : countries) {
+                %>
                 <option><%=country.getName()%></option>
-            <%
-                }
-            %>
+                <%
+                    }
+                %>
             </select>
         </div>
-
         <div>
             <label for="check-in">Check in</label>
-            <input id="check-in" type="date" name="check_in">
+            <input id="check-in" type="date" name="check_in" value="<%= checkIn %>">
         </div>
-
         <div>
             <label for="check-out">Check out</label>
-            <input id="check-out" type="date" name="check_out">
+            <input id="check-out" type="date" name="check_out" value="<%= checkOut %>">
         </div>
-
         <div>
             <label for="adults">Adults</label>
-            <input id="adults" type="number" placeholder="1" min="0" name="adults">
+            <input id="adults" type="number" placeholder="1" min="0" name="adults" value="<%= adults  %>">
         </div>
         <div>
             <label for="children">Children</label>
-            <input id="children" type="number" placeholder="0" min="0" name="children">
+            <input id="children" type="number" placeholder="0" min="0" name="children" value="<%= children %>">
         </div>
         <button type="submit">Search</button>
     </form>
 
-     <%
+    <%
             if("POST".equalsIgnoreCase(request.getMethod())){
      %>
         <section class="hotel-list">
@@ -300,9 +362,8 @@
          }
      %>
 
-
     <footer>
-        &copy; 2024 Travel Agency. All Rights Reserved.
+        <p>&copy; 2024 Travel Agency. All rights reserved.</p>
     </footer>
 </body>
 </html>

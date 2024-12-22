@@ -37,9 +37,9 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(body);
 
-//            System.out.println("Start to send email");
-//            Transport.send(message);
-//            System.out.println("Email sent successfully");
+            System.out.println("Start to send email");
+            Transport.send(message);
+            System.out.println("Email sent successfully");
             return true;
         } catch (Exception exception) {
             System.err.println("Error sending email " + exception.getMessage());

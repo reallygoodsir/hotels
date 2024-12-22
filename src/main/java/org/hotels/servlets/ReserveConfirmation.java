@@ -29,7 +29,7 @@ public class ReserveConfirmation extends HttpServlet {
             }
             String userEmailConfirmationCode = req.getParameter("emailConfirmationCode");
             String emailConfirmationCode = (String) session.getAttribute("emailConfirmationCode");
-            if (userEmailConfirmationCode == null || !emailConfirmationCode.equalsIgnoreCase(userEmailConfirmationCode)) {
+            if (!emailConfirmationCode.equalsIgnoreCase(userEmailConfirmationCode)) {
                 req.setAttribute("invalidEmailCode", "true");
                 RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve.jsp");
                 dispatcher.forward(req, resp);
@@ -40,11 +40,11 @@ public class ReserveConfirmation extends HttpServlet {
             String phoneNumber = (String) session.getAttribute("phoneNumber");
 
             BigDecimal pricePerNight = (BigDecimal) session.getAttribute("roomPrice");
-            Long days = (Long) session.getAttribute("dayDistance");
+            Integer days = (Integer) session.getAttribute("dayDistance");
             BigDecimal totalPrice = pricePerNight.multiply(new BigDecimal(days));
             req.setAttribute("totalPrice", totalPrice);
-            Date checkIn = (Date) session.getAttribute("checkIn");
-            Date checkOut = (Date) session.getAttribute("checkOut");
+            Date checkIn = (Date) session.getAttribute("checkInDate");
+            Date checkOut = (Date) session.getAttribute("checkOutDate");
             int hotelId = (int) session.getAttribute("hotelId");
             int roomId = (int) session.getAttribute("roomId");
 
