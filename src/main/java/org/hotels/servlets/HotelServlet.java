@@ -40,7 +40,7 @@ public class HotelServlet extends HttpServlet {
                         if(optionalHotel.isPresent()){
                             hotel = optionalHotel.get();
                         }else{
-                            throw new Exception("Hotel Id is supposed to be valid");
+                               throw new Exception("Hotel Id is supposed to be valid");
                         }
                         session.setAttribute("hotel", hotel);
                         session.setAttribute("hotelName", hotel.getName());

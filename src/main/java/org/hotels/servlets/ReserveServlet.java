@@ -3,7 +3,7 @@ package org.hotels.servlets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hotels.services.EmailService;
-import org.hotels.validators.CustomerValidation;
+import org.hotels.validators.CustomerValidator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -38,9 +38,9 @@ public class ReserveServlet extends HttpServlet {
             String email = req.getParameter("email");
             String phoneNumber = req.getParameter("phoneNumber");
             String name = req.getParameter("name");
-            CustomerValidation customerValidation = new CustomerValidation();
-            boolean isValidEmail = customerValidation.isEmailValid(email);
-            boolean isValidPhoneNumber = customerValidation.isPhoneNumberValid(phoneNumber);
+            CustomerValidator customerValidator = new CustomerValidator();
+            boolean isValidEmail = customerValidator.isEmailValid(email);
+            boolean isValidPhoneNumber = customerValidator.isPhoneNumberValid(phoneNumber);
             session.setAttribute("email", email);
             session.setAttribute("phoneNumber", phoneNumber);
             session.setAttribute("name", name);

@@ -6,7 +6,7 @@ import org.hotels.dao.*;
 import org.hotels.models.Country;
 import org.hotels.models.Hotel;
 import org.hotels.models.Room;
-import org.hotels.validators.SearchValidation;
+import org.hotels.validators.SearchValidator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,58 +43,67 @@ public class HomeServlet extends HttpServlet {
             req.setAttribute("allCountries", allCountries);
 
             HttpSession session = req.getSession(true);
-            SearchValidation validationService = new SearchValidation();
+            SearchValidator validationService = new SearchValidator();
             String countryName = req.getParameter("destination");
-            String children = req.getParameter("children");
-            int childrenCapacity = validationService.validateChildrenCapacity(children);
-            String adults = req.getParameter("adults");
-            int adultCapacity = validationService.validateAdultCapacity(adults);
-            if (childrenCapacity < 0) {
-                session.setAttribute("childrenCapacityError", "f");
-            } else {
-                session.setAttribute("children", Integer.parseInt(req.getParameter("children")));
-            }
-            if (adultCapacity < 1) {
-                session.setAttribute("adultCapacityError", "true");
-            } else {
-                session.setAttribute("adults", Integer.parseInt(req.getParameter("adults")));
-            }
-            String checkInString = req.getParameter("check_in");
-            String checkOutString = req.getParameter("check_out");
 
-            boolean isValidCheckIn = validationService.validateCheckIn(checkInString);
-            boolean isValidCheckOut = validationService.validateCheckOut(checkOutString);
+            String adults = req.getParameter("adults");
+            boolean isAdultCapacityValid = validationService.isAdultCapacityValid(adults);
+            int adultCapacity = 0;
+            if (isAdultCapacityValid) {
+                adultCapacity = Integer.parseInt(req.getParameter("adults"));
+                session.setAttribute("adults", adultCapacity);
+            } else {
+                session.setAttribute("adultCapacityError", "true");
+            }
+
+            String children = req.getParameter("children");
+            boolean isChildrenCapacityValid = validationService.isChildrenCapacityValid(children);
+            int childrenCapacity = 0;
+            if (isChildrenCapacityValid) {
+                childrenCapacity = Integer.parseInt(req.getParameter("children"));
+                session.setAttribute("children", childrenCapacity);
+            } else {
+                session.setAttribute("childrenCapacityError", "true");
+            }
+
+            String checkInString = req.getParameter("check_in");
+            boolean isCheckInValid = validationService.isCheckInValid(checkInString);
+
+            if (isCheckInValid) {
+                session.setAttribute("checkIn", checkInString);
+            } else {
+                session.setAttribute("checkInError", "true");
+            }
+
+            String checkOutString = req.getParameter("check_out");
+            boolean isCheckOutValid = validationService.isCheckOutValid(checkOutString);
+            if (isCheckOutValid) {
+                session.setAttribute("checkOut", checkOutString);
+            } else {
+                session.setAttribute("checkOutError", "true");
+            }
+
+            boolean isDayDistanceValid = false;
             Date checkInDate = null;
             Date checkOutDate = null;
-            if (isValidCheckIn && isValidCheckOut) {
-                session.setAttribute("checkIn", checkInString);
-                session.setAttribute("checkOut", checkOutString);
+            if (isCheckInValid && isCheckOutValid) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 checkInDate = dateFormat.parse(checkInString);
                 checkOutDate = dateFormat.parse(checkOutString);
-                int dayDistance = validationService.validateAndCalculateDayDistance(checkInDate, checkOutDate);
+                int dayDistance = validationService.isDayDistanceValid(checkInDate, checkOutDate);
                 if (dayDistance == -1) {
                     session.setAttribute("dayDistanceTooShort", "true");
                 } else if (dayDistance == -2) {
                     session.setAttribute("checkInBeforeCheckOut", "true");
                 } else {
+                    isDayDistanceValid = true;
                     session.setAttribute("dayDistance", dayDistance);
                     session.setAttribute("checkInDate", checkInDate);
                     session.setAttribute("checkOutDate", checkOutDate);
                 }
-            } else {
-                if (!isValidCheckIn) {
-                    session.setAttribute("checkInError", "true");
-                } else {
-                    session.setAttribute("checkIn", checkInString);
-                }
-                if (!isValidCheckOut) {
-                    session.setAttribute("checkOutError", "true");
-                } else {
-                    session.setAttribute("checkOut", checkOutString);
-                }
             }
-            if (isValidCheckIn && isValidCheckOut) {
+
+            if (isAdultCapacityValid && isChildrenCapacityValid && isCheckInValid && isCheckOutValid && isDayDistanceValid) {
                 RoomDAO roomDAO = new RoomDAOImpl();
                 HotelDAO hotelDAO = new HotelDAOImpl();
                 Map<String, List<Hotel>> hotels = hotelDAO.searchForHotels(countryName, childrenCapacity, adultCapacity);

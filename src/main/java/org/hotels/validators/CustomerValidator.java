@@ -2,7 +2,7 @@ package org.hotels.validators;
 
 import java.util.regex.Pattern;
 
-public class CustomerValidation {
+public class CustomerValidator {
     public boolean isEmailValid(String email) {
         if (email == null || email.isEmpty()) {
             return false;

@@ -7,7 +7,7 @@ import org.hotels.dao.TransactionDAOImpl;
 import org.hotels.models.Customer;
 import org.hotels.models.Transaction;
 import org.hotels.services.EmailService;
-import org.hotels.validators.CustomerValidation;
+import org.hotels.validators.CustomerValidator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -32,8 +32,8 @@ public class ReserveConfirmation extends HttpServlet {
             }
             String userEmailConfirmationCode = req.getParameter("emailConfirmationCode");
             String emailConfirmationCode = (String) session.getAttribute("emailConfirmationCode");
-            CustomerValidation customerValidation = new CustomerValidation();
-            if (!customerValidation.isValidEmailCode(userEmailConfirmationCode, emailConfirmationCode)) {
+            CustomerValidator customerValidator = new CustomerValidator();
+            if (!customerValidator.isValidEmailCode(userEmailConfirmationCode, emailConfirmationCode)) {
                 req.setAttribute("invalidEmailCode", "true");
                 RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve.jsp");
                 dispatcher.forward(req, resp);

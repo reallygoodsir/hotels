@@ -333,26 +333,27 @@
             <%
                 String countryName = (String) request.getAttribute("countryName");
                 Map<String, List<Hotel>> hotelsMap = (Map<String, List<Hotel>>) session.getAttribute("hotels");
+                if(hotelsMap != null && !hotelsMap.isEmpty()){
+                    for (Map.Entry<String, List<Hotel>> entry : hotelsMap.entrySet()) {
+                        String city = entry.getKey();
+                        List<Hotel> hotelList = entry.getValue();
 
-                for (Map.Entry<String, List<Hotel>> entry : hotelsMap.entrySet()) {
-                    String city = entry.getKey();
-                    List<Hotel> hotelList = entry.getValue();
+                        for (Hotel hotel : hotelList) {
+                            HotelAddress hotelAddress = hotel.getHotelAddress();
+                            String hotelName = hotel.getName().replace(" ", "-");
+                %>
+                            <div class="hotel-card">
+                                <img src="images/<%= hotelName %>.png" alt="Hotel Image">
+                                <div class="hotel-info">
+                                    <div class="hotel-name"><%= hotel.getName() %></div>
+                                    <div class="hotel-location"><%= city %>, <%= countryName %></div>
+                                    <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>&cityName=<%= city %>&countryName=<%= countryName %>"
+                                       class="view-details">View Details</a>
 
-                    for (Hotel hotel : hotelList) {
-                        HotelAddress hotelAddress = hotel.getHotelAddress();
-                        String hotelName = hotel.getName().replace(" ", "-");
-            %>
-                        <div class="hotel-card">
-                            <img src="images/<%= hotelName %>.png" alt="Hotel Image">
-                            <div class="hotel-info">
-                                <div class="hotel-name"><%= hotel.getName() %></div>
-                                <div class="hotel-location"><%= city %>, <%= countryName %></div>
-                                <a href="http://localhost:8080/hotels/hotel?hotelId=<%= hotel.getId() %>&cityName=<%= city %>&countryName=<%= countryName %>"
-                                   class="view-details">View Details</a>
-
+                                </div>
                             </div>
-                        </div>
-            <%
+                <%
+                        }
                     }
                 }
             %>
