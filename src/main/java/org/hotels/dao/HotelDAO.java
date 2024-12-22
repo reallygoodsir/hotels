@@ -1,6 +1,5 @@
 package org.hotels.dao;
 
-import org.hotels.models.Country;
 import org.hotels.models.Hotel;
 
 import java.util.List;

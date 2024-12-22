@@ -1,5 +1,7 @@
 package org.hotels.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.models.City;
 import org.hotels.models.Country;
 import org.hotels.models.Street;
@@ -10,11 +12,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class CountryDAOImpl implements CountryDAO {
+    private static final Logger logger = LogManager.getLogger(CountryDAOImpl.class);
     private static final String SELECT_ALL_COUNTRIES = "select name from hotels_db.country";
     private static final String SELECT_COUNTRY_BY_NAME = "select * from country " +
             "where name = ?";
-    private static final String SELECT_COUNTRY_BY_ID = "select name from country " +
-            "where country_id = ?";
     private static final String INSERT_COUNTRY = "insert into country " +
             "(name) " +
             "values(?)";
@@ -119,7 +120,7 @@ public class CountryDAOImpl implements CountryDAO {
             connection.commit();
             return true;
         } catch (Exception exception) {
-            System.err.println("Error during creating a country" + exception);
+            logger.error("Error during creating a country", exception);
             return false;
         }
     }
@@ -138,7 +139,7 @@ public class CountryDAOImpl implements CountryDAO {
             }
             return countries;
         } catch (Exception exception) {
-            System.err.println("Error while getting all countries " + exception.getMessage());
+            logger.error("Error while getting all countries ", exception);
             return Collections.emptyList();
         }
     }
@@ -156,26 +157,8 @@ public class CountryDAOImpl implements CountryDAO {
             }
             throw new Exception("country doesnt exist");
         } catch (Exception exception) {
-            System.err.println("countrydao error " + exception.getMessage());
+            logger.error("Error while getting the city with the name {}", name, exception);
             return -1;
-        }
-    }
-
-    @Override
-    public String getById(int id) {
-        try (
-                Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-                PreparedStatement stmtSelectStreet = connection.prepareStatement(SELECT_COUNTRY_BY_ID)
-        ) {
-            stmtSelectStreet.setInt(1, id);
-            ResultSet resultSet = stmtSelectStreet.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString(1);
-            }
-            throw new Exception("country doesnt exist");
-        } catch (Exception exception) {
-            System.err.println("citydao error " + exception.getMessage());
-            return null;
         }
     }
 }

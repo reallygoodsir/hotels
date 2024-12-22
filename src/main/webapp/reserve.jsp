@@ -86,6 +86,17 @@
             color: white;
             margin-top: 20px;
         }
+       .error-label {
+           background-color: #ffe5e5;
+           color: #d8000c;
+           padding: 10px;
+           border-radius: 5px;
+           margin: 10px auto;
+           text-align: center;
+           font-size: 1rem;
+           max-width: 500px;
+           box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+       }
     </style>
 </head>
 <body>
@@ -111,6 +122,12 @@
                         if(sessionEmail != null){
                             email = sessionEmail;
                         }
+                        String emailError = (String) session.getAttribute("emailError");
+                        if(emailError != null){
+                    %>
+                        <div class="error-label">Incorrect email</div><br>
+                    <%
+                        }
                     %>
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<%= email %>" required>
@@ -120,6 +137,12 @@
                         String sessionPhoneNumber = (String) session.getAttribute("phoneNumber");
                         if(sessionPhoneNumber != null){
                             phoneNumber = sessionPhoneNumber;
+                        }
+                        String phoneNumberError = (String) session.getAttribute("phoneNumberError");
+                        if(phoneNumberError != null){
+                    %>
+                        <div class="error-label">Incorrect phone number</div><br>
+                    <%
                         }
                     %>
                     <label for="phoneNumber">Phone Number:</label>
@@ -132,6 +155,8 @@
                         if(sessionName != null){
                             name = sessionName;
                         }
+                        session.removeAttribute("phoneNumberError");
+                        session.removeAttribute("emailError");
                     %>
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" value="<%= name %>" required

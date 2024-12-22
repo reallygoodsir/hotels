@@ -8,5 +8,4 @@ public interface CountryDAO extends GeneralDAO {
     boolean create(Country country);
     List<Country> getAllCountries();
     int getByName(String name);
-    String getById(int id);
 }

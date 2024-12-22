@@ -1,16 +1,22 @@
 package org.hotels.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.models.Room;
 import org.hotels.models.RoomInfo;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RoomDAOImpl implements RoomDAO {
+    private static final Logger logger = LogManager.getLogger(RoomDAOImpl.class);
     private static final String SELECT_ROOMS_FOR_HOTEL = "select  " +
             "room.room_id as room_id, " +
             "room.room_number as room_number, " +
@@ -67,20 +73,16 @@ public class RoomDAOImpl implements RoomDAO {
             if (!rooms.isEmpty()) {
                 return rooms;
             } else {
-                System.out.println("no rooms for hotel with the id " + hotelId); // replace this with logger.warn
                 return Collections.emptyList();
             }
         } catch (Exception exception) {
-            System.err.println("Error while getting rooms for the hotel with the id " + hotelId + exception.getMessage());
-            exception.printStackTrace();
+            logger.error("Error while getting rooms for the hotel with the id {}", hotelId, exception);
             return Collections.emptyList();
         }
     }
 
     @Override
     public List<Room> getUnreservedRooms(List<Room> rooms, java.util.Date checkIn, java.util.Date checkOut) {
-        List<Integer> roomIds = rooms.stream().map(Room::getId).collect(Collectors.toList());
-        System.out.println("Checking room ids " + roomIds + " checkIn " + checkIn + " checkOut " + checkOut);
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             List<Room> availableRooms = new ArrayList<>();
             for (Room room : rooms) {
@@ -93,19 +95,15 @@ public class RoomDAOImpl implements RoomDAO {
 
                     ResultSet resultSet = stmtVerifyRooms.executeQuery();
                     if (!resultSet.next()) {
-                        System.out.println("Room is available. Adding room with id " + room.getId());
                         availableRooms.add(room);
-                    } else {
-                        System.out.println("Room is NOT available with id " + room.getId());
                     }
                 }
             }
             List<Integer> availableRoomsIds = availableRooms.stream().map(Room::getId).collect(Collectors.toList());
-            System.out.println("Available rooms ids " + availableRoomsIds);
+            logger.info("Available rooms ids: {} ", availableRoomsIds);
             return availableRooms;
         } catch (Exception exception) {
-            System.err.println("Error while connecting to the database: " + exception.getMessage());
-            exception.printStackTrace();
+            logger.error("Error while getting all the unreserved rooms: ", exception);
             return Collections.emptyList();
         }
     }

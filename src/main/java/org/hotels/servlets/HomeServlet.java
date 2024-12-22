@@ -1,10 +1,12 @@
 package org.hotels.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.dao.*;
 import org.hotels.models.Country;
 import org.hotels.models.Hotel;
 import org.hotels.models.Room;
-import org.hotels.services.ValidationService;
+import org.hotels.validators.SearchValidation;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,23 +22,28 @@ import java.util.List;
 import java.util.Map;
 
 public class HomeServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(HomeServlet.class);
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        List<Country> allCountries = getAllCountries();
-        req.setAttribute("allCountries", allCountries);
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
-        dispatcher.forward(req, resp);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            List<Country> allCountries = getAllCountries();
+            req.setAttribute("allCountries", allCountries);
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
+            dispatcher.forward(req, resp);
+        }catch (Exception exception){
+            logger.error("Error while getting all countries ", exception);
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
+            dispatcher.forward(req, resp);
+        }
     }
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             List<Country> allCountries = getAllCountries();
             req.setAttribute("allCountries", allCountries);
 
             HttpSession session = req.getSession(true);
-            ValidationService validationService = new ValidationService();
+            SearchValidation validationService = new SearchValidation();
             String countryName = req.getParameter("destination");
             String children = req.getParameter("children");
             int childrenCapacity = validationService.validateChildrenCapacity(children);
@@ -130,8 +137,9 @@ public class HomeServlet extends HttpServlet {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {
-            System.err.println("Error while in HomeServlet doPost " + exception.getMessage());
-            exception.printStackTrace();
+            logger.error("Error while processing the user search ", exception);
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
+            dispatcher.forward(req, resp);
         }
     }
 

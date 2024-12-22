@@ -1,11 +1,15 @@
 package org.hotels.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class StreetDAOImpl implements StreetDAO {
+    private static final Logger logger = LogManager.getLogger(StreetDAOImpl.class);
     private static final String SELECT_STREET = "select * from street " +
             "where name = ? and city_id = ?";
 
@@ -21,9 +25,9 @@ public class StreetDAOImpl implements StreetDAO {
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
-            throw new Exception("country doesnt exist");
+            throw new Exception("Couldn't get the street");
         } catch (Exception exception) {
-            System.err.println("streetdao error " + exception.getMessage());
+            logger.error("Error while getting street with the name {}", name, exception);
             return -1;
         }
     }

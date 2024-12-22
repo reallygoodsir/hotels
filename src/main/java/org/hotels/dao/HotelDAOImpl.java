@@ -1,11 +1,14 @@
 package org.hotels.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.models.*;
 
 import java.sql.*;
 import java.util.*;
 
 public class HotelDAOImpl implements HotelDAO {
+    private static final Logger logger = LogManager.getLogger(HotelDAOImpl.class);
     private static final String SELECT_HOTEL = "select " +
             "hotel.name as hotel_name, " +
             "hotel_info.details as details, " +
@@ -153,7 +156,7 @@ public class HotelDAOImpl implements HotelDAO {
 
             connection.commit();
         } catch (Exception exception) {
-            System.err.println("Error while creating/updating hotel" + exception.getMessage());
+            logger.error("Error while creating/updating hotel", exception);
         }
     }
 
@@ -190,7 +193,7 @@ public class HotelDAOImpl implements HotelDAO {
 
             return result;
         } catch (Exception exception) {
-            System.err.println("error while searching for hotels " + exception.getMessage());
+            logger.error("error while searching for hotels ", exception);
             return Collections.emptyMap();
         }
     }
@@ -217,7 +220,7 @@ public class HotelDAOImpl implements HotelDAO {
                 throw new Exception("Couldn't get a hotel");
             }
         } catch (Exception exception) {
-            System.err.println("Error while trying to get hotel with the id " + id + "\n" + exception.getMessage());
+            logger.error("Error while trying to get hotel with the id {} ", id, exception);
             return Optional.empty();
         }
     }

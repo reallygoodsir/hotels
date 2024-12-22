@@ -1,10 +1,13 @@
 package org.hotels.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.dao.TransactionDAO;
 import org.hotels.dao.TransactionDAOImpl;
 import org.hotels.models.Customer;
 import org.hotels.models.Transaction;
 import org.hotels.services.EmailService;
+import org.hotels.validators.CustomerValidation;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,13 +18,13 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Random;
 
 public class ReserveConfirmation extends HttpServlet {
 
+    private static final Logger logger = LogManager.getLogger(ReserveConfirmation.class);
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             HttpSession session = req.getSession(false);
             if (session == null) {
@@ -29,7 +32,8 @@ public class ReserveConfirmation extends HttpServlet {
             }
             String userEmailConfirmationCode = req.getParameter("emailConfirmationCode");
             String emailConfirmationCode = (String) session.getAttribute("emailConfirmationCode");
-            if (!emailConfirmationCode.equalsIgnoreCase(userEmailConfirmationCode)) {
+            CustomerValidation customerValidation = new CustomerValidation();
+            if (!customerValidation.isValidEmailCode(userEmailConfirmationCode, emailConfirmationCode)) {
                 req.setAttribute("invalidEmailCode", "true");
                 RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve.jsp");
                 dispatcher.forward(req, resp);
@@ -55,12 +59,16 @@ public class ReserveConfirmation extends HttpServlet {
             req.setAttribute("confirmationNumber", confirmationNumber);
             session.invalidate();
             EmailService emailService = new EmailService();
-            emailService.send("Hotel Reservations", "Your reservation number is " + confirmationNumber, email);
+            boolean hotelReservations = emailService.send("Hotel Reservations", "Your reservation number is " + confirmationNumber, email);
+            if(!hotelReservations){
+                throw new Exception("Error while sending the message to user email");
+            }
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve-confirmation.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {
-            System.err.println("Error while trying to initialize and confirm the reservation" + exception.getMessage());
-            exception.printStackTrace();
+            logger.error("Error while trying to initialize and confirm the reservation", exception);
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
+            dispatcher.forward(req, resp);
         }
     }
 }

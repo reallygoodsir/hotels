@@ -1,5 +1,7 @@
 package org.hotels.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hotels.models.Customer;
 import org.hotels.models.Transaction;
 
@@ -7,6 +9,7 @@ import java.sql.*;
 import java.util.UUID;
 
 public class TransactionDAOImpl implements TransactionDAO {
+    private static final Logger logger = LogManager.getLogger(TransactionDAOImpl.class);
     private static final String SELECT_CUSTOMER = "select customer_id from customer " +
             "where name = ? or email = ?";
     private static final String INSERT_CUSTOMER = "insert into customer " +
@@ -65,8 +68,7 @@ public class TransactionDAOImpl implements TransactionDAO {
                 return confirmationNumber.toString();
             }
         } catch (Exception exception) {
-            System.err.println("Error while trying to calculate the total price" + exception.getMessage());
-            exception.printStackTrace();
+            logger.error("Error while trying to calculate the total price", exception);
             return null;
         }
     }

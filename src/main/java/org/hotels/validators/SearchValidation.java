@@ -1,12 +1,11 @@
-package org.hotels.services;
+package org.hotels.validators;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-public class ValidationService {
+public class SearchValidation {
     public boolean validateCheckIn(String checkIn) {
         return checkIn != null && !checkIn.isEmpty();
     }
