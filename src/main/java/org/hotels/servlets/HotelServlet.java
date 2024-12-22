@@ -42,10 +42,10 @@ public class HotelServlet extends HttpServlet {
                         }else{
                             throw new Exception("Hotel Id is supposed to be valid");
                         }
-//                        session.setAttribute("hotel", hotel);
-//                        session.setAttribute("hotelName", hotel.getName());
-//                        session.setAttribute("hotelId", hotel.getId());
-//                        session.setAttribute("hotelRooms", roomsForHotel);
+                        session.setAttribute("hotel", hotel);
+                        session.setAttribute("hotelName", hotel.getName());
+                        session.setAttribute("hotelId", hotel.getId());
+                        session.setAttribute("hotelRooms", roomsForHotel);
                     }
                 }
             }
