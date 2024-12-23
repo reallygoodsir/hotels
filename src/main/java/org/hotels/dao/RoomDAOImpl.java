@@ -70,10 +70,10 @@ public class RoomDAOImpl implements RoomDAO {
                     rooms.add(room);
                 }
             }
-            if (!rooms.isEmpty()) {
-                return rooms;
-            } else {
+            if (rooms.isEmpty()) {
                 return Collections.emptyList();
+            } else {
+                return rooms;
             }
         } catch (Exception exception) {
             logger.error("Error while getting rooms for the hotel with the id {}", hotelId, exception);

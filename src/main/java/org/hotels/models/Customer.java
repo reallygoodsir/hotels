@@ -2,8 +2,8 @@ package org.hotels.models;
 
 public class Customer {
     private String name;
-    private String email;
-    private String phoneNumber;
+    private final String email;
+    private final String phoneNumber;
 
     public Customer(String name, String email, String phoneNumber) {
         this.name = name;
@@ -11,7 +11,6 @@ public class Customer {
         this.phoneNumber = phoneNumber;
     }
 
-    public Customer() {}
     public String getName() {
         return name;
     }
@@ -24,15 +23,8 @@ public class Customer {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 }

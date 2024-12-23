@@ -20,12 +20,13 @@ import java.util.Optional;
 
 public class HotelServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(HotelServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             HttpSession session = req.getSession(false);
             if (session == null) {
-                throw new Exception("session should be created");
+                throw new Exception("session should have been created in home servlet");
             }
 
             String hotelId = req.getParameter("hotelId");
@@ -33,19 +34,20 @@ public class HotelServlet extends HttpServlet {
             Map<String, List<Hotel>> hotelMap = (Map<String, List<Hotel>>) session.getAttribute("hotels");
             for (List<Hotel> hotels : hotelMap.values()) {
                 for (Hotel hotel : hotels) {
-                    if(hotel.getId() == Integer.parseInt(hotelId)){
+                    if (hotel.getId() == Integer.parseInt(hotelId)) {
                         List<Room> roomsForHotel = hotel.getRooms();
                         HotelDAO hotelDAO = new HotelDAOImpl();
                         Optional<Hotel> optionalHotel = hotelDAO.getHotel(hotel.getId());
-                        if(optionalHotel.isPresent()){
+                        if (optionalHotel.isPresent()) {
                             hotel = optionalHotel.get();
-                        }else{
-                               throw new Exception("Hotel Id is supposed to be valid");
+                        } else {
+                            throw new Exception("Hotel Id is supposed to be valid");
                         }
                         session.setAttribute("hotel", hotel);
                         session.setAttribute("hotelName", hotel.getName());
                         session.setAttribute("hotelId", hotel.getId());
                         session.setAttribute("hotelRooms", roomsForHotel);
+                        break;
                     }
                 }
             }

@@ -23,6 +23,7 @@ import java.util.Map;
 
 public class HomeServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(HomeServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -30,21 +31,23 @@ public class HomeServlet extends HttpServlet {
             req.setAttribute("allCountries", allCountries);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");
             dispatcher.forward(req, resp);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             logger.error("Error while getting all countries ", exception);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
             dispatcher.forward(req, resp);
         }
     }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            HttpSession session = req.getSession(true);
             List<Country> allCountries = getAllCountries();
             req.setAttribute("allCountries", allCountries);
-
-            HttpSession session = req.getSession(true);
             SearchValidator validationService = new SearchValidator();
+
             String countryName = req.getParameter("destination");
+            req.setAttribute("countryName", countryName);
 
             String adults = req.getParameter("adults");
             boolean isAdultCapacityValid = validationService.isAdultCapacityValid(adults);
@@ -95,6 +98,8 @@ public class HomeServlet extends HttpServlet {
                     session.setAttribute("dayDistanceTooShort", "true");
                 } else if (dayDistance == -2) {
                     session.setAttribute("checkInBeforeCheckOut", "true");
+                } else if (dayDistance == -3) {
+                    throw new Exception("Error while trying to calculate the day distance");
                 } else {
                     isDayDistanceValid = true;
                     session.setAttribute("dayDistance", dayDistance);
@@ -107,40 +112,40 @@ public class HomeServlet extends HttpServlet {
                 RoomDAO roomDAO = new RoomDAOImpl();
                 HotelDAO hotelDAO = new HotelDAOImpl();
                 Map<String, List<Hotel>> hotels = hotelDAO.searchForHotels(countryName, childrenCapacity, adultCapacity);
-
-                List<Room> allRooms = new ArrayList<>();
-                for (List<Hotel> listHotel : hotels.values()) {
-                    for (Hotel hotel : listHotel) {
-                        List<Room> rooms = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
-                        if (!rooms.isEmpty()) {
-                            for (Room room : rooms) {
-                                room.setHotelId(hotel.getId());
-                                allRooms.add(room);
-                            }
-                        }
-                    }
-                }
-                // verify the allRooms list availability in a separate method in room dao
-                List<Room> unreservedRooms = roomDAO.getUnreservedRooms(allRooms, checkInDate, checkOutDate);
-
-                for (List<Hotel> hotelList : hotels.values()) {
-                    for (Hotel hotel : hotelList) {
-                        for (Room room : unreservedRooms) {
-                            if (hotel.getId() == room.getHotelId()) {
-                                List<Room> rooms = hotel.getRooms();
-                                if (rooms == null) {
-                                    hotel.setRooms(new ArrayList<>());
+                if (!hotels.isEmpty()) {
+                    List<Room> allRooms = new ArrayList<>();
+                    for (List<Hotel> listHotel : hotels.values()) {
+                        for (Hotel hotel : listHotel) {
+                            List<Room> rooms = roomDAO.getRoomsForHotel(hotel.getId(), adultCapacity, childrenCapacity);
+                            if (!rooms.isEmpty()) {
+                                for (Room room : rooms) {
+                                    room.setHotelId(hotel.getId());
+                                    allRooms.add(room);
                                 }
-                                hotel.getRooms().add(room);
                             }
                         }
                     }
-                }
+                    // verify the allRooms list availability in a separate method in room dao
+                    List<Room> unreservedRooms = roomDAO.getUnreservedRooms(allRooms, checkInDate, checkOutDate);
 
-                for (List<Hotel> hotelList : hotels.values()) {
-                    hotelList.removeIf(hotel -> hotel.getRooms() == null || hotel.getRooms().isEmpty());
+                    for (List<Hotel> hotelList : hotels.values()) {
+                        for (Hotel hotel : hotelList) {
+                            for (Room room : unreservedRooms) {
+                                if (hotel.getId() == room.getHotelId()) {
+                                    List<Room> rooms = hotel.getRooms();
+                                    if (rooms == null) {
+                                        hotel.setRooms(new ArrayList<>());
+                                    }
+                                    hotel.getRooms().add(room);
+                                }
+                            }
+                        }
+                    }
+
+                    for (List<Hotel> hotelList : hotels.values()) {
+                        hotelList.removeIf(hotel -> hotel.getRooms() == null || hotel.getRooms().isEmpty());
+                    }
                 }
-                req.setAttribute("countryName", countryName);
                 session.setAttribute("hotels", hotels);
             }
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/home.jsp");

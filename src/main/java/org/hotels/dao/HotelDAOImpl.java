@@ -190,8 +190,11 @@ public class HotelDAOImpl implements HotelDAO {
                     result.put(cityName, hotels);
                 }
             }
-
-            return result;
+            if (result.isEmpty()) {
+                return Collections.emptyMap();
+            } else {
+                return result;
+            }
         } catch (Exception exception) {
             logger.error("error while searching for hotels ", exception);
             return Collections.emptyMap();

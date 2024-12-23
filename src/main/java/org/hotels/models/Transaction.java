@@ -4,15 +4,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Transaction {
-    private int roomId;
+    private final int roomId;
     private int hotelId;
     private int customerId;
-    private BigDecimal totalPrice;
-    private Date checkIn;
-    private Date checkOut;
+    private final BigDecimal totalPrice;
+    private final Date checkIn;
+    private final Date checkOut;
 
-    public Transaction() {}
-    public Transaction(int roomId, int hotelId,  BigDecimal totalPrice, Date checkIn, Date checkOut) {
+    public Transaction(int roomId, int hotelId, BigDecimal totalPrice, Date checkIn, Date checkOut) {
         this.roomId = roomId;
         this.hotelId = hotelId;
         this.totalPrice = totalPrice;
@@ -22,10 +21,6 @@ public class Transaction {
 
     public int getRoomId() {
         return roomId;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
     }
 
     public int getHotelId() {
@@ -48,23 +43,11 @@ public class Transaction {
         return totalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
     public Date getCheckIn() {
         return checkIn;
     }
 
-    public void setCheckIn(Date checkIn) {
-        this.checkIn = checkIn;
-    }
-
     public Date getCheckOut() {
         return checkOut;
-    }
-
-    public void setCheckOut(Date checkOut) {
-        this.checkOut = checkOut;
     }
 }

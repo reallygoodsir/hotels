@@ -16,12 +16,13 @@ import java.util.List;
 
 public class RoomServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(RoomServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             HttpSession session = req.getSession(false);
             if (session == null) {
-                throw new Exception("session should be created");
+                throw new Exception("session should have been created in home servlet");
             }
             List<Room> rooms = (List<Room>) session.getAttribute("hotelRooms");
             int roomId = Integer.parseInt(req.getParameter("roomId"));

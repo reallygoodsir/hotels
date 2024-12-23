@@ -10,5 +10,6 @@ public interface HotelDAO extends GeneralDAO {
     void create(Hotel hotel);
 
     Map<String, List<Hotel>> searchForHotels(String countryName, int childrenCapacity, int adultCapacity);
+
     Optional<Hotel> getHotel(int id);
 }

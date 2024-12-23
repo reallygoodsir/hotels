@@ -137,7 +137,11 @@ public class CountryDAOImpl implements CountryDAO {
                 country.setName(resultSet.getString("name"));
                 countries.add(country);
             }
-            return countries;
+            if (countries.isEmpty()) {
+                throw new Exception("Couldn't get any countries");
+            } else {
+                return countries;
+            }
         } catch (Exception exception) {
             logger.error("Error while getting all countries ", exception);
             return Collections.emptyList();
@@ -154,8 +158,9 @@ public class CountryDAOImpl implements CountryDAO {
             ResultSet resultSet = stmtSelectStreet.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);
+            } else {
+                throw new Exception("country doesnt exist");
             }
-            throw new Exception("country doesnt exist");
         } catch (Exception exception) {
             logger.error("Error while getting the city with the name {}", name, exception);
             return -1;

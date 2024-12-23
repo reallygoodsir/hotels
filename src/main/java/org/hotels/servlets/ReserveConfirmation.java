@@ -28,7 +28,7 @@ public class ReserveConfirmation extends HttpServlet {
         try {
             HttpSession session = req.getSession(false);
             if (session == null) {
-                throw new Exception("no session in confirm reserve servlet");
+                throw new Exception("session should have been created in home servlet");
             }
             String userEmailConfirmationCode = req.getParameter("emailConfirmationCode");
             String emailConfirmationCode = (String) session.getAttribute("emailConfirmationCode");
@@ -39,6 +39,7 @@ public class ReserveConfirmation extends HttpServlet {
                 dispatcher.forward(req, resp);
                 return;
             }
+
             String email = (String) session.getAttribute("email");
             String name = (String) session.getAttribute("name");
             String phoneNumber = (String) session.getAttribute("phoneNumber");
@@ -56,13 +57,18 @@ public class ReserveConfirmation extends HttpServlet {
             Transaction transaction = new Transaction(roomId, hotelId, totalPrice, checkIn, checkOut);
             TransactionDAO transactionDAO = new TransactionDAOImpl();
             String confirmationNumber = transactionDAO.executeTransaction(customer, transaction);
-            req.setAttribute("confirmationNumber", confirmationNumber);
-            session.invalidate();
-            EmailService emailService = new EmailService();
-            boolean hotelReservations = emailService.send("Hotel Reservations", "Your reservation number is " + confirmationNumber, email);
-            if(!hotelReservations){
-                throw new Exception("Error while sending the message to user email");
+            if(confirmationNumber != null) {
+                req.setAttribute("confirmationNumber", confirmationNumber);
+            }else{
+                throw new Exception("Couldn't create a new transaction");
             }
+            EmailService emailService = new EmailService();
+            boolean hotelReservations = emailService.send("Hotel Reservations",
+                    "Your reservation number is " + confirmationNumber, email);
+            if(!hotelReservations){
+                throw new Exception("Couldn't send an email to the customer");
+            }
+            session.invalidate();
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve-confirmation.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {

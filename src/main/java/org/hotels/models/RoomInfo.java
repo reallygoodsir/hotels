@@ -12,20 +12,15 @@ public class RoomInfo {
     private boolean hasAirConditioning;
     private String details;
 
+    public RoomInfo() {
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
     }
 
     public String getRoomType() {

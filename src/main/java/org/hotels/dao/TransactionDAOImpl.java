@@ -43,7 +43,7 @@ public class TransactionDAOImpl implements TransactionDAO {
                                 transaction.setCustomerId(generatedKeys.getInt(1));
                             } else {
                                 connection.rollback();
-                                throw new Exception("Couldn't get generated keys");
+                                throw new Exception("Couldn't create a new customer");
                             }
                         }
                     }
@@ -63,9 +63,13 @@ public class TransactionDAOImpl implements TransactionDAO {
                 stmtInsertTransaction.setDate(6, checkOutSql);
                 UUID confirmationNumber = UUID.randomUUID();
                 stmtInsertTransaction.setString(7, confirmationNumber.toString());
-                stmtInsertTransaction.executeUpdate();
-                connection.commit();
-                return confirmationNumber.toString();
+                int isUpdateSuccessful = stmtInsertTransaction.executeUpdate();
+                if (isUpdateSuccessful == 1) {
+                    connection.commit();
+                    return confirmationNumber.toString();
+                } else {
+                    throw new Exception("Couldn't create a new transaction");
+                }
             }
         } catch (Exception exception) {
             logger.error("Error while trying to calculate the total price", exception);

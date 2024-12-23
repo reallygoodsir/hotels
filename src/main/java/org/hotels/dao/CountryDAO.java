@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface CountryDAO extends GeneralDAO {
     boolean create(Country country);
+
     List<Country> getAllCountries();
+
     int getByName(String name);
 }

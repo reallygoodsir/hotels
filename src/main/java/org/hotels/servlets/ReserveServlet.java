@@ -16,13 +16,14 @@ import java.util.Random;
 
 public class ReserveServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(ReserveServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/reserve.jsp");
             dispatcher.forward(req, resp);
         } catch (Exception exception) {
-            logger.error("Error while redirecting to reserve jsp (doGet) ", exception);
+            logger.error("Error while redirecting to reserve jsp ", exception);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
             dispatcher.forward(req, resp);
         }
@@ -33,21 +34,24 @@ public class ReserveServlet extends HttpServlet {
         try {
             HttpSession session = req.getSession(false);
             if (session == null) {
-                throw new Exception("no session in confirm reserve servlet");
+                throw new Exception("session should have been created in home servlet");
             }
             String email = req.getParameter("email");
             String phoneNumber = req.getParameter("phoneNumber");
             String name = req.getParameter("name");
+
             CustomerValidator customerValidator = new CustomerValidator();
             boolean isValidEmail = customerValidator.isEmailValid(email);
             boolean isValidPhoneNumber = customerValidator.isPhoneNumberValid(phoneNumber);
+
             session.setAttribute("email", email);
             session.setAttribute("phoneNumber", phoneNumber);
             session.setAttribute("name", name);
+
             if (!isValidEmail) {
                 session.setAttribute("emailError", "true");
             }
-            if(!isValidPhoneNumber){
+            if (!isValidPhoneNumber) {
                 session.setAttribute("phoneNumberError", "true");
             }
 

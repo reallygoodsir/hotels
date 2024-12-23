@@ -23,8 +23,9 @@ public class CityDAOImpl implements CityDAO {
             ResultSet resultSet = stmtSelectStreet.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);
+            } else {
+                throw new Exception("City couldn't be find");
             }
-            throw new Exception("City couldn't be find");
         } catch (Exception exception) {
             logger.error("Error while getting a city with the name {} ", name, exception);
             return -1;

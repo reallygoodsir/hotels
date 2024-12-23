@@ -8,15 +8,6 @@ public class Hotel {
     private HotelAddress hotelAddress;
     private HotelInfo hotelInfo;
     private List<Room> rooms;
-    private boolean isReserved;
-
-    public boolean isReserved() {
-        return isReserved;
-    }
-
-    public void setReserved(boolean reserved) {
-        isReserved = reserved;
-    }
 
     public int getId() {
         return id;

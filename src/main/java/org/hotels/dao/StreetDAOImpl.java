@@ -24,8 +24,9 @@ public class StreetDAOImpl implements StreetDAO {
             ResultSet resultSet = stmtSelectStreet.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);
+            } else {
+                throw new Exception("Couldn't get the street");
             }
-            throw new Exception("Couldn't get the street");
         } catch (Exception exception) {
             logger.error("Error while getting street with the name {}", name, exception);
             return -1;
