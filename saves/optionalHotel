@@ -1,6 +1,0 @@
-Optional<Hotel> optionalHotel = hotelDAO.getHotel(Integer.parseInt(hotelId));
-    if (optionalHotel.isPresent()) {
-    Hotel hotel = optionalHotel.get();
-    session.setAttribute("hotel", hotel);
-    session.setAttribute("hotelId", hotel.getId());
-}
